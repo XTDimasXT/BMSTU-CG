@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import simpledialog
 import tkinter.messagebox as tkmb
 import tkinter.ttk as ttk
 import math
@@ -10,7 +11,8 @@ def paint_dot(event):
     x1, y1, x2, y2 = (event.x - 3), (event.y - 3), (event.x + 3), (event.y + 3)
     colour = "#000fff000"
     canvas.create_oval(x1, y1, x2, y2, fill=colour)
-    arr_dots.append([event.x, event.y])
+    if [event.x, event.y] not in arr_dots:
+        arr_dots.append([event.x, event.y])
 
 
 def show_dot(x, y, arr_dots):
@@ -82,6 +84,62 @@ def perform_actions(action):
     
     elif action == 5:
         tkmb.showinfo("Об авторе", "Автор программы - Писаренко Дмитрий ИУ7-44Б")
+    
+    elif action == 6:
+        if len(arr_dots) == 0:
+            tkmb.showinfo("Удаление точки", "На данный момент на поле нет точек")
+        else:
+            new_coords = simpledialog.askstring("Удаление точки", "Введите координаты через пробел").split()
+            if len(new_coords) != 2:
+                tkmb.showerror("Ошибка", "Координаты - это два различных числа")
+            else:
+                try:
+                    x_coord = int(new_coords[0])
+                    y_coord = int(new_coords[1])
+                except:
+                    tkmb.showerror("Ошибка", "Координаты могут задаваться только целыми числами")
+                
+                new_coords = [x_coord, y_coord]
+                if new_coords in arr_dots:
+                    arr_dots.remove(new_coords)
+                else:
+                    tkmb.showinfo("Удаление точки", "Такая точка не была введена")
+        
+    
+    elif action == 7:
+        if len(arr_dots) == 0:
+            tkmb.showinfo("Редактирование точки", "На данный момент на поле нет точек")
+        else:
+            dot_coords = simpledialog.askstring("Редактирование точки", "Введите координаты через пробел (точки, которую хотите заменить)").split()
+            try:
+                x_coord = int(dot_coords[0])
+                y_coord = int(dot_coords[1])
+            except:
+                tkmb.showerror("Ошибка", "Координаты могут задаваться только целыми числами")
+            
+            if x_coord > 700 or y_coord > 700 or x_coord < 0 or y_coord < 0:
+                tkmb.showerror("Ошибка", "Переданы значения, выходящие за размеры поля")
+            else:
+                dot_coords = [x_coord, y_coord]
+                if dot_coords in arr_dots:
+                    new_coords = simpledialog.askstring("Редактирование точки", "Введите координаты через пробел (точки, которую хотите добавить)").split()
+                    try:
+                        x_coord_new = int(new_coords[0])
+                        y_coord_new = int(new_coords[1])
+                    except:
+                        tkmb.showerror("Ошибка", "Координаты могут задаваться только целыми числами")
+
+                    if x_coord_new > 700 or y_coord_new > 700 or x_coord_new < 0 or y_coord_new < 0:
+                        tkmb.showerror("Ошибка", "Переданы значения, выходящие за размеры поля")
+
+                    new_coords = [x_coord_new, y_coord_new]
+                    if new_coords in arr_dots:
+                        tkmb.showwarning("Предупреждение", "Эта точка уже существует на поле")
+                    else:
+                        arr_dots.remove(dot_coords)
+                        arr_dots.append(new_coords)
+                        print(arr_dots)
+
 
 
 def create_triangle(res_dots):
@@ -155,44 +213,69 @@ window = tk.Tk()
 window.title("Лабораторная работа №1. Геометрические построения.")
 window.geometry("1000x700")
 
+#Конфигурация
+window.columnconfigure(0, weight=1)
+window.columnconfigure(1, weight=1)
+window.columnconfigure(2, weight=1000)
+window.columnconfigure(3, weight=1)
+window.columnconfigure(4, weight=1)
+
+window.rowconfigure(0, weight=1)
+window.rowconfigure(1, weight=1)
+window.rowconfigure(2, weight=1)
+window.rowconfigure(3, weight=1)
+window.rowconfigure(4, weight=1)
+window.rowconfigure(5, weight=1000)
+window.rowconfigure(6, weight=1)
+window.rowconfigure(7, weight=1)
+window.rowconfigure(8, weight=1)
+window.rowconfigure(9, weight=1)
+
+
 # Настройка поля для рисования
 canvas = tk.Canvas(window, width=700, height=700, bg="white")
 canvas.bind("<Button-1>", paint_dot)
 
 # Текст
-label_x = tk.Label(text="Значение по x:")
-label_y = tk.Label(text="Значение по y:")
+label_x = tk.Label(text="Значение по x:", font="Helvetica 10")
+label_y = tk.Label(text="Значение по y:", font="Helvetica 10")
+label_res = tk.Label(text="Результат программы:                  ", font="Helvetica 10")
 
 # Поля ввода и вывода
-entry_x = tk.Entry()
-entry_y = tk.Entry()
-result = tk.Entry(width=100)
+entry_x = tk.Entry(width=22)
+entry_y = tk.Entry(width=22)
+result = tk.Entry(width=35, font="Helvetica 11")
 
 # Кнопки
-point = tk.Button(window, text="Поставить точку", command = lambda: perform_actions(1))
-clear = tk.Button(window, text="Очистить экран", command = lambda: perform_actions(2))
-calculate = tk.Button(window, text="Выполнить задание", command = lambda: perform_actions(3))
+point = tk.Button(window, text="Поставить точку", width=40, command = lambda: perform_actions(1))
+clear = tk.Button(window, text="Очистить экран", width=40, command = lambda: perform_actions(2))
+calculate = tk.Button(window, text="Выполнить задание", width=40, command = lambda: perform_actions(3))
+delete = tk.Button(window, text="Удалить точку", width=40, command = lambda: perform_actions(6))
+redact = tk.Button(window, text="Редактировать точку", width=40, command = lambda: perform_actions(7))
 
 # Вкладки
-frame1 = tk.Button(window, text="О программе", command = lambda: perform_actions(4))
-frame2 = tk.Button(window, text="Об авторе", command = lambda: perform_actions(5))
-
-frame1.pack(anchor=tk.NW)
-frame2.pack(anchor=tk.NW)
+tab1 = tk.Button(window, text="О программе", command = lambda: perform_actions(4))
+tab2 = tk.Button(window, text="Об авторе", command = lambda: perform_actions(5))
 
 # Размещение
-canvas.pack(side=tk.LEFT)
+tab1.grid(column=0, row=0, sticky="nw", padx=5, pady=5)
+tab2.grid(column=1, row=0, sticky="nw", padx=5, pady=5)
 
-label_x.pack(anchor=tk.N)
-entry_x.pack(anchor=tk.N)
-label_y.pack(anchor=tk.N)
-entry_y.pack(anchor=tk.N)
+canvas.grid(column=0, row=1, columnspan=4, rowspan=7, sticky="w")
 
-point.pack(anchor=tk.N)
-clear.pack(side=tk.BOTTOM)
-calculate.pack(side=tk.BOTTOM)
+label_x.grid(column=3, row=0, sticky="ne", padx=5, pady=5)
+entry_x.grid(column=3, row=1, sticky="ne", padx=5, pady=5)
+label_y.grid(column=4, row=0, sticky="ne", padx=5, pady=5)
+entry_y.grid(column=4, row=1, sticky="ne", padx=5, pady=5)
 
-result.pack(side=tk.RIGHT)
+label_res.grid(column=3, row=3, columnspan=2, sticky="se", padx=5, pady=5)
+result.grid(column=3, row=4, columnspan=2, sticky="se", padx=5, pady=5)
 result.config(stat=tk.DISABLED)
+
+point.grid(column=3, row=2, columnspan=2, sticky="se")
+clear.grid(column=3, row=6, columnspan=2, sticky="se")
+calculate.grid(column=3, row=7, columnspan=2, sticky="se")
+delete.grid(column=3, row=8, columnspan=2, sticky="se")
+redact.grid(column=3, row=9, columnspan=2, sticky="se")
 
 window.mainloop()
