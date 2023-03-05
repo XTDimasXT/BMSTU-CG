@@ -15,7 +15,6 @@ def paint_dot(event):
     clear_not_full()
     if [event.x, event.y] not in arr_dots:
         arr_dots.append([event.x, event.y])
-    print(arr_dots)
 
 
 def show_dot(x, y, arr_dots):
@@ -25,7 +24,6 @@ def show_dot(x, y, arr_dots):
     canvas.create_text(x1 + 5, y1 + 15, text="{0} {1}".format(x, y), tags="text")
     clear_not_full()
     arr_dots.append([x, y])
-    print(arr_dots)
 
 def clean_labels():
     entry_x.delete(0, tk.END)
@@ -264,8 +262,8 @@ canvas = tk.Canvas(window, width=700, height=700, bg="white")
 canvas.bind("<Button-1>", paint_dot)
 
 # Текст
-label_x = tk.Label(text="Значение по x:", font="Helvetica 10")
-label_y = tk.Label(text="Значение по y:", font="Helvetica 10")
+label_x = tk.Label(text="Значение по X:", font="Helvetica 10")
+label_y = tk.Label(text="Значение по Y:", font="Helvetica 10")
 label_res = tk.Label(text="Результат программы:                  ", font="Helvetica 10")
 
 # Поля ввода и вывода
@@ -288,7 +286,7 @@ tab2 = tk.Button(window, text="Об авторе", command = lambda: perform_act
 tab1.grid(column=0, row=0, sticky="nw", padx=5, pady=5)
 tab2.grid(column=1, row=0, sticky="nw", padx=5, pady=5)
 
-canvas.grid(column=0, row=1, columnspan=4, rowspan=7, sticky="w")
+canvas.grid(column=0, row=1, columnspan=4, rowspan=9, sticky="w")
 
 label_x.grid(column=3, row=0, sticky="ne", padx=5, pady=5)
 entry_x.grid(column=3, row=1, sticky="ne", padx=5, pady=5)
