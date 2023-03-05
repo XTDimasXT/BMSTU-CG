@@ -11,16 +11,21 @@ def paint_dot(event):
     x1, y1, x2, y2 = (event.x - 3), (event.y - 3), (event.x + 3), (event.y + 3)
     colour = "#000fff000"
     canvas.create_oval(x1, y1, x2, y2, fill=colour)
+    canvas.create_text(x1 + 5, y1 + 15, text="{0} {1}".format(event.x, event.y), tags="text")
+    clear_not_full()
     if [event.x, event.y] not in arr_dots:
         arr_dots.append([event.x, event.y])
+    print(arr_dots)
 
 
 def show_dot(x, y, arr_dots):
     x1, y1, x2, y2 = (x - 3), (y - 3), (x + 3), (y + 3)
     colour = "#000fff000"
     canvas.create_oval(x1, y1, x2, y2, fill=colour)
+    canvas.create_text(x1 + 5, y1 + 15, text="{0} {1}".format(x, y), tags="text")
+    clear_not_full()
     arr_dots.append([x, y])
-
+    print(arr_dots)
 
 def clean_labels():
     entry_x.delete(0, tk.END)
@@ -31,6 +36,27 @@ def clean_table(arr_dots):
     canvas.delete("all")
     arr_dots.clear()
 
+    result.config(stat=tk.NORMAL)
+    result.delete(0, tk.END)
+    result.config(stat=tk.DISABLED)
+
+
+def canvas_recreate(arr_dots):
+    canvas.delete("all")
+
+    result.config(stat=tk.NORMAL)
+    result.delete(0, tk.END)
+    result.config(stat=tk.DISABLED)
+
+    for i in range(len(arr_dots)):
+        x1, y1, x2, y2 = (arr_dots[i][0] - 3), (arr_dots[i][1] - 3), (arr_dots[i][0] + 3), (arr_dots[i][1] + 3)
+        colour = "#000fff000"
+        canvas.create_oval(x1, y1, x2, y2, fill=colour)
+        canvas.create_text(arr_dots[i][0] + 5, arr_dots[i][1] + 15, text="{0} {1}".format(arr_dots[i][0], arr_dots[i][1]))
+
+
+def clear_not_full():
+    canvas.delete("lines", "circles")
     result.config(stat=tk.NORMAL)
     result.delete(0, tk.END)
     result.config(stat=tk.DISABLED)
@@ -102,6 +128,7 @@ def perform_actions(action):
                 new_coords = [x_coord, y_coord]
                 if new_coords in arr_dots:
                     arr_dots.remove(new_coords)
+                    canvas_recreate(arr_dots)
                 else:
                     tkmb.showinfo("Удаление точки", "Такая точка не была введена")
         
@@ -122,7 +149,7 @@ def perform_actions(action):
             else:
                 dot_coords = [x_coord, y_coord]
                 if dot_coords in arr_dots:
-                    new_coords = simpledialog.askstring("Редактирование точки", "Введите координаты через пробел (точки, которую хотите добавить)").split()
+                    new_coords = simpledialog.askstring("Редактирование точки", "Введите координаты через пробел (точки, которую хотите добавить)", parent=window).split()
                     try:
                         x_coord_new = int(new_coords[0])
                         y_coord_new = int(new_coords[1])
@@ -138,7 +165,7 @@ def perform_actions(action):
                     else:
                         arr_dots.remove(dot_coords)
                         arr_dots.append(new_coords)
-                        print(arr_dots)
+                        canvas_recreate(arr_dots)
 
 
 
