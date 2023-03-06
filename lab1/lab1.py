@@ -5,33 +5,41 @@ import tkinter.ttk as ttk
 import math
 
 arr_dots = []
+prev_arr = []
 
 def paint_dot(event):
-    global arr_dots
+    global arr_dots, prev_arr
     x1, y1, x2, y2 = (event.x - 3), (event.y - 3), (event.x + 3), (event.y + 3)
     colour = "#000fff000"
     canvas.create_oval(x1, y1, x2, y2, fill=colour)
     canvas.create_text(x1 + 5, y1 + 15, text="{0} {1}".format(event.x, event.y), tags="text")
     clear_not_full()
+    prev_arr = arr_dots.copy()
     if [event.x, event.y] not in arr_dots:
         arr_dots.append([event.x, event.y])
 
 
-def show_dot(x, y, arr_dots):
+def show_dot(x, y, arr_dots, prev_arr):
     x1, y1, x2, y2 = (x - 3), (y - 3), (x + 3), (y + 3)
     colour = "#000fff000"
     canvas.create_oval(x1, y1, x2, y2, fill=colour)
     canvas.create_text(x1 + 5, y1 + 15, text="{0} {1}".format(x, y), tags="text")
     clear_not_full()
-    arr_dots.append([x, y])
+    prev_arr = arr_dots.copy()
+    if [x, y] not in arr_dots:
+        arr_dots.append([x, y])
+
 
 def clean_labels():
     entry_x.delete(0, tk.END)
     entry_y.delete(0, tk.END)
 
 
-def clean_table(arr_dots):
+def clean_table():
+    global arr_dots, prev_arr
     canvas.delete("all")
+
+    prev_arr = arr_dots.copy()
     arr_dots.clear()
 
     result.config(stat=tk.NORMAL)
@@ -51,6 +59,7 @@ def canvas_recreate(arr_dots):
         colour = "#000fff000"
         canvas.create_oval(x1, y1, x2, y2, fill=colour)
         canvas.create_text(arr_dots[i][0] + 5, arr_dots[i][1] + 15, text="{0} {1}".format(arr_dots[i][0], arr_dots[i][1]))
+    
 
 
 def clear_not_full():
@@ -61,7 +70,7 @@ def clear_not_full():
 
 
 def perform_actions(action):
-    global arr_dots
+    global arr_dots, prev_arr
 
     if action == 1:
         x = entry_x.get()
@@ -74,10 +83,10 @@ def perform_actions(action):
                 clean_labels()
                 return 1
             if x >= 0 and x <= 700 and y >= 0 and y <= 700:
-                show_dot(int(x), int(y), arr_dots)
+                show_dot(int(x), int(y), arr_dots, prev_arr)
                 clean_labels()
             else:
-                tkmb.showerror("Ошибка ввода", "Переданы значения, выходящие за размеры поля")
+                tkmb.showerror("Ошибка ввода", "Переданы значения, выходящие за размеры поля 700x700")
                 clean_labels()
                 return 1
         else:
@@ -86,13 +95,15 @@ def perform_actions(action):
             return 1
     
     elif action == 2:
-        clean_table(arr_dots)
-    
+        clean_table()
+
     elif action == 3:
+
         if len(arr_dots) <= 2:
             tkmb.showerror("Ошибка выполнения", "Введено менее 3 точек")
             return 1
 
+        prev_arr = arr_dots.copy()
         canvas.delete("lines", "circles")
         res = find_min_delta()
         if res != -1:
@@ -125,6 +136,7 @@ def perform_actions(action):
                 
                 new_coords = [x_coord, y_coord]
                 if new_coords in arr_dots:
+                    prev_arr = arr_dots.copy()
                     arr_dots.remove(new_coords)
                     canvas_recreate(arr_dots)
                 else:
@@ -136,35 +148,45 @@ def perform_actions(action):
             tkmb.showinfo("Редактирование точки", "На данный момент на поле нет точек")
         else:
             dot_coords = simpledialog.askstring("Редактирование точки", "Введите координаты через пробел (точки, которую хотите заменить)").split()
-            try:
-                x_coord = int(dot_coords[0])
-                y_coord = int(dot_coords[1])
-            except:
-                tkmb.showerror("Ошибка", "Координаты могут задаваться только целыми числами")
-            
-            if x_coord > 700 or y_coord > 700 or x_coord < 0 or y_coord < 0:
-                tkmb.showerror("Ошибка", "Переданы значения, выходящие за размеры поля")
+            if len(dot_coords) != 2:
+                tkmb.showerror("Ошибка", "Координаты - это два различных числа")
             else:
-                dot_coords = [x_coord, y_coord]
-                if dot_coords in arr_dots:
-                    new_coords = simpledialog.askstring("Редактирование точки", "Введите координаты через пробел (точки, которую хотите добавить)", parent=window).split()
-                    try:
-                        x_coord_new = int(new_coords[0])
-                        y_coord_new = int(new_coords[1])
-                    except:
-                        tkmb.showerror("Ошибка", "Координаты могут задаваться только целыми числами")
+                try:
+                    x_coord = int(dot_coords[0])
+                    y_coord = int(dot_coords[1])
+                except:
+                    tkmb.showerror("Ошибка", "Координаты могут задаваться только целыми числами")
+                
+                if x_coord > 700 or y_coord > 700 or x_coord < 0 or y_coord < 0:
+                    tkmb.showerror("Ошибка", "Переданы значения, выходящие за размеры поля")
+                else:
+                    dot_coords = [x_coord, y_coord]
+                    if dot_coords in arr_dots:
+                        new_coords = simpledialog.askstring("Редактирование точки", "Введите координаты через пробел (точки, которую хотите добавить)", parent=window).split()
+                        if len(new_coords) != 2:
+                            tkmb.showerror("Ошибка", "Координаты - это два различных числа")
+                        else:
+                            try:
+                                x_coord_new = int(new_coords[0])
+                                y_coord_new = int(new_coords[1])
+                            except:
+                                tkmb.showerror("Ошибка", "Координаты могут задаваться только целыми числами")
 
-                    if x_coord_new > 700 or y_coord_new > 700 or x_coord_new < 0 or y_coord_new < 0:
-                        tkmb.showerror("Ошибка", "Переданы значения, выходящие за размеры поля")
+                            if x_coord_new > 700 or y_coord_new > 700 or x_coord_new < 0 or y_coord_new < 0:
+                                tkmb.showerror("Ошибка", "Переданы значения, выходящие за размеры поля 700x700")
 
-                    new_coords = [x_coord_new, y_coord_new]
-                    if new_coords in arr_dots:
-                        tkmb.showwarning("Предупреждение", "Эта точка уже существует на поле")
-                    else:
-                        arr_dots.remove(dot_coords)
-                        arr_dots.append(new_coords)
-                        canvas_recreate(arr_dots)
-
+                            new_coords = [x_coord_new, y_coord_new]
+                            if new_coords in arr_dots:
+                                tkmb.showwarning("Предупреждение", "Эта точка уже существует на поле")
+                            else:
+                                prev_arr = arr_dots.copy()
+                                arr_dots.remove(dot_coords)
+                                arr_dots.append(new_coords)
+                                canvas_recreate(arr_dots)
+    
+    elif action == 8:
+        arr_dots = prev_arr.copy()
+        canvas_recreate(arr_dots)
 
 
 def create_triangle(res_dots):
@@ -255,6 +277,7 @@ window.rowconfigure(6, weight=1)
 window.rowconfigure(7, weight=1)
 window.rowconfigure(8, weight=1)
 window.rowconfigure(9, weight=1)
+window.rowconfigure(10, weight=1)
 
 
 # Настройка поля для рисования
@@ -277,6 +300,7 @@ clear = tk.Button(window, text="Очистить экран", width=40, command 
 calculate = tk.Button(window, text="Выполнить задание", width=40, command = lambda: perform_actions(3))
 delete = tk.Button(window, text="Удалить точку", width=40, command = lambda: perform_actions(6))
 redact = tk.Button(window, text="Редактировать точку", width=40, command = lambda: perform_actions(7))
+cancel = tk.Button(window, text="Вернуть последнее действие", width=40, command = lambda: perform_actions(8))
 
 # Вкладки
 tab1 = tk.Button(window, text="О программе", command = lambda: perform_actions(4))
@@ -286,7 +310,7 @@ tab2 = tk.Button(window, text="Об авторе", command = lambda: perform_act
 tab1.grid(column=0, row=0, sticky="nw", padx=5, pady=5)
 tab2.grid(column=1, row=0, sticky="nw", padx=5, pady=5)
 
-canvas.grid(column=0, row=1, columnspan=4, rowspan=9, sticky="w")
+canvas.grid(column=0, row=1, columnspan=4, rowspan=10, sticky="w")
 
 label_x.grid(column=3, row=0, sticky="ne", padx=5, pady=5)
 entry_x.grid(column=3, row=1, sticky="ne", padx=5, pady=5)
@@ -302,5 +326,6 @@ clear.grid(column=3, row=6, columnspan=2, sticky="se")
 calculate.grid(column=3, row=7, columnspan=2, sticky="se")
 delete.grid(column=3, row=8, columnspan=2, sticky="se")
 redact.grid(column=3, row=9, columnspan=2, sticky="se")
+cancel.grid(column=3, row=10, columnspan=2, sticky="se")
 
 window.mainloop()
