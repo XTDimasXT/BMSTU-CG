@@ -12,7 +12,7 @@ def paint_dot(event):
     x1, y1, x2, y2 = (event.x - 3), (event.y - 3), (event.x + 3), (event.y + 3)
     colour = "#000fff000"
     canvas.create_oval(x1, y1, x2, y2, fill=colour)
-    canvas.create_text(x1 + 5, y1 + 15, text="{0} {1}".format(event.x, event.y), tags="text")
+    canvas.create_text(x1 + 5, y1 + 15, text="({0}; {1})".format(event.x, event.y), tags="text")
     clear_not_full()
     prev_arr = arr_dots.copy()
     if [event.x, event.y] not in arr_dots:
@@ -23,7 +23,7 @@ def show_dot(x, y, arr_dots, prev_arr):
     x1, y1, x2, y2 = (x - 3), (y - 3), (x + 3), (y + 3)
     colour = "#000fff000"
     canvas.create_oval(x1, y1, x2, y2, fill=colour)
-    canvas.create_text(x1 + 5, y1 + 15, text="{0} {1}".format(x, y), tags="text")
+    canvas.create_text(x1 + 5, y1 + 15, text="({0}; {1})".format(x, y), tags="text")
     clear_not_full()
     prev_arr = arr_dots.copy()
     if [x, y] not in arr_dots:
@@ -58,7 +58,7 @@ def canvas_recreate(arr_dots):
         x1, y1, x2, y2 = (arr_dots[i][0] - 3), (arr_dots[i][1] - 3), (arr_dots[i][0] + 3), (arr_dots[i][1] + 3)
         colour = "#000fff000"
         canvas.create_oval(x1, y1, x2, y2, fill=colour)
-        canvas.create_text(arr_dots[i][0] + 5, arr_dots[i][1] + 15, text="{0} {1}".format(arr_dots[i][0], arr_dots[i][1]))
+        canvas.create_text(arr_dots[i][0] + 5, arr_dots[i][1] + 15, text="({0}; {1})".format(arr_dots[i][0], arr_dots[i][1]))
     
 
 
