@@ -1,2 +1,3 @@
 # BMSTU-ComputerGraphic
-Вариант №17
+Вариант №17  
+2023
