@@ -5,8 +5,12 @@ import tkinter.ttk as ttk
 import math
 import copy
 
-arr = []
-anchor = anchor_default = [150, 200]
+arr = prev_arr = []
+anchor = anchor_default = prev_anchor = [150, 200]
+prev_dx = prev_dy = 0
+prev_scale_x = prev_scale_y = 1
+last_action = -1
+
 
 def array_preparation(file):
     global arr
@@ -76,12 +80,16 @@ def create_triangle(arr, ind1, ind2, ind3):
 
 
 def perform_actions(action):
-    global arr, arr_default, anchor, anchor_default
+    global arr, arr_default, anchor, anchor_default, last_action, prev_dx, prev_dy, prev_scale_x, prev_scale_y
 
     if action == 0:
         create_drawing(arr_default, anchor_default)
+        prev_arr = copy.deepcopy(arr)
+        prev_anchor = copy.deepcopy(anchor)
         arr = copy.deepcopy(arr_default)
         anchor = copy.deepcopy(anchor_default)
+
+        last_action = 0
     
     elif action == 1:
         dx = entry_dx.get()
@@ -94,17 +102,20 @@ def perform_actions(action):
             for i in range(len(arr)):
                 arr[i][0] += dx
                 arr[i][1] += dy
+            
+            prev_dx = dx
+            prev_dy = dy
         
             create_drawing(arr, anchor)
         except:
             tkmb.showerror("Ошибка", "Координаты могут задаваться только целыми числами")
         
-        entry_dx.delete(0, tk.END)
-        entry_dy.delete(0, tk.END)
+        last_action = 1
     
     elif action == 2:
         anchor_x = entry_anchor_x.get()
         anchor_y = entry_anchor_y.get()
+        prev_anchor = anchor
 
         try:
             anchor_x = int(anchor_x)
@@ -114,8 +125,7 @@ def perform_actions(action):
         except:
             tkmb.showerror("Ошибка", "Координаты могут задаваться только целыми числами")
         
-        entry_anchor_x.delete(0, tk.END)
-        entry_anchor_y.delete(0, tk.END)
+        last_action = 2
     
     elif action == 3:
         angle = entry_angle.get()
@@ -132,6 +142,67 @@ def perform_actions(action):
             create_drawing(arr, anchor)
         except:
             tkmb.showerror("Ошибка", "Угол может задаваться только действительным числом")
+        
+        last_action = 3
+        
+    elif action == 4:
+        scale_x = entry_scale_x.get()
+        scale_y = entry_scale_y.get()
+
+        try:
+            scale_x = float(scale_x)
+            scale_y = float(scale_y)
+
+            for i in range(len(arr)):
+                tmp_x = scale_x * (arr[i][0] - anchor[0]) + anchor[0]
+                tmp_y = scale_y * (arr[i][1] - anchor[1]) + anchor[1]
+                arr[i] = [tmp_x, tmp_y]
+            
+            prev_scale_x = 1 / scale_x
+            prev_scale_y = 1 / scale_y
+            
+            create_drawing(arr, anchor)
+        except:
+            tkmb.showerror("Ошибка", "Масштабирование может задаваться только действительным числом")
+        
+        last_action = 4
+    
+    elif action == 5:
+        
+        if last_action == 0:
+            arr = copy.deepcopy(prev_arr)
+            anchor = copy.deepcopy(prev_anchor)
+            create_drawing(arr, anchor)
+        
+        elif last_action == 1:
+            for i in range(len(arr)):
+                arr[i][0] -= prev_dx
+                arr[i][1] -= prev_dy
+            
+            create_drawing(arr, anchor)
+        
+        elif last_action == 2:
+            anchor = prev_anchor
+            create_drawing(arr, anchor)
+        
+        elif last_action == 3:
+            angle *= 0.8 * 180 / math.pi
+            angle = 360 - angle
+
+            create_drawing(arr, anchor)
+        
+        elif last_action == 4:
+            for i in range(len(arr)):
+                tmp_x = prev_scale_x * (arr[i][0] - anchor[0]) + anchor[0]
+                tmp_y = prev_scale_y * (arr[i][1] - anchor[1]) + anchor[1]
+                arr[i] = [tmp_x, tmp_y]
+            
+            create_drawing(arr, anchor)
+        
+        elif last_action == -1:
+            tkmb.showinfo("Вернуть последнее действие", "Вернуть последнее действие можно только один раз")
+            
+        last_action = -1
 
     elif action == 6:
         tkmb.showinfo("Условие программы", "Программа рисует исходный рисунок на холсте и производит действия согласно кнопкам.\n"
@@ -204,14 +275,13 @@ scale = tk.Button(window, text="Масштабировать", width=40, command
 cancel = tk.Button(window, text="Вернуть последнее действие", width=40, command=lambda: perform_actions(5))
 
 # Вкладки
-tab1 = tk.Button(window, text="О программе", command=lambda: perform_actions(6))
-tab2 = tk.Button(window, text="Об авторе", command=lambda: perform_actions(7))
+menu = tk.Menu()
+window.config(menu=menu)
+menu.add_command(label="О программе", command=lambda: perform_actions(6))
+menu.add_command(label="Об авторе", command=lambda: perform_actions(7))
 
 # Размещение
-tab1.grid(column=0, row=0, sticky="nw", padx=5, pady=5)
-tab2.grid(column=1, row=0, sticky="nw", padx=5, pady=5)
-
-canvas.grid(column=0, row=1, columnspan=4, rowspan=13, sticky="w")
+canvas.grid(column=0, row=0, columnspan=4, rowspan=14, sticky="w")
 
 label_dx.grid(column=3, row=0, sticky="ne", padx=5, pady=5)
 entry_dx.grid(column=3, row=1, sticky="ne", padx=5, pady=5)
