@@ -10,6 +10,7 @@ anchor = anchor_default = prev_anchor = [150, 200]
 prev_dx = prev_dy = 0
 prev_scale_x = prev_scale_y = 1
 last_action = -1
+angle = 0
 
 
 def array_preparation(file):
@@ -80,7 +81,7 @@ def create_triangle(arr, ind1, ind2, ind3):
 
 
 def perform_actions(action):
-    global arr, arr_default, anchor, anchor_default, last_action, prev_dx, prev_dy, prev_scale_x, prev_scale_y
+    global arr, arr_default, anchor, angle, anchor_default, last_action, prev_dx, prev_dy, prev_scale_x, prev_scale_y, prev_anchor
 
     if action == 0:
         create_drawing(arr_default, anchor_default)
@@ -109,6 +110,8 @@ def perform_actions(action):
             create_drawing(arr, anchor)
         except:
             tkmb.showerror("Ошибка", "Координаты могут задаваться только целыми числами")
+            entry_dx.delete(0, tk.END)
+            entry_dy.delete(0, tk.END)
         
         last_action = 1
     
@@ -124,6 +127,8 @@ def perform_actions(action):
             create_drawing(arr, anchor)
         except:
             tkmb.showerror("Ошибка", "Координаты могут задаваться только целыми числами")
+            entry_anchor_x.delete(0, tk.END)
+            entry_anchor_y.delete(0, tk.END)
         
         last_action = 2
     
@@ -142,6 +147,7 @@ def perform_actions(action):
             create_drawing(arr, anchor)
         except:
             tkmb.showerror("Ошибка", "Угол может задаваться только действительным числом")
+            entry_angle.delete(0, tk.END)
         
         last_action = 3
         
@@ -164,6 +170,8 @@ def perform_actions(action):
             create_drawing(arr, anchor)
         except:
             tkmb.showerror("Ошибка", "Масштабирование может задаваться только действительным числом")
+            entry_scale_x.delete(0, tk.END)
+            entry_scale_y.delete(0, tk.END)
         
         last_action = 4
     
@@ -172,36 +180,33 @@ def perform_actions(action):
         if last_action == 0:
             arr = copy.deepcopy(prev_arr)
             anchor = copy.deepcopy(prev_anchor)
-            create_drawing(arr, anchor)
         
         elif last_action == 1:
             for i in range(len(arr)):
                 arr[i][0] -= prev_dx
                 arr[i][1] -= prev_dy
-            
-            create_drawing(arr, anchor)
         
         elif last_action == 2:
             anchor = prev_anchor
-            create_drawing(arr, anchor)
         
         elif last_action == 3:
-            angle *= 0.8 * 180 / math.pi
-            angle = 360 - angle
+            angle = 2 * math.pi - angle
 
-            create_drawing(arr, anchor)
+            for i in range(len(arr)):
+                tmp_x = (arr[i][0] - anchor[0]) * math.cos(angle) - (arr[i][1] - anchor[1]) * math.sin(angle) + anchor[0]
+                tmp_y = (arr[i][0] - anchor[0]) * math.sin(angle) + (arr[i][1] - anchor[1]) * math.cos(angle) + anchor[1]
+                arr[i] = [tmp_x, tmp_y]
         
         elif last_action == 4:
             for i in range(len(arr)):
                 tmp_x = prev_scale_x * (arr[i][0] - anchor[0]) + anchor[0]
                 tmp_y = prev_scale_y * (arr[i][1] - anchor[1]) + anchor[1]
                 arr[i] = [tmp_x, tmp_y]
-            
-            create_drawing(arr, anchor)
         
         elif last_action == -1:
             tkmb.showinfo("Вернуть последнее действие", "Вернуть последнее действие можно только один раз")
-            
+        
+        create_drawing(arr, anchor)
         last_action = -1
 
     elif action == 6:
