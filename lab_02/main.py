@@ -5,8 +5,11 @@ import tkinter.ttk as ttk
 import math
 import copy
 
-arr = prev_arr = []
-anchor = anchor_default = prev_anchor = [150, 200]
+arr = []
+prev_arr = []
+anchor = [150, 200]
+anchor_default = [150, 200]
+prev_anchor = [150, 200]
 prev_dx = prev_dy = 0
 prev_scale_x = prev_scale_y = 1
 last_action = -1
