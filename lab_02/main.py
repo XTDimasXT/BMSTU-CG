@@ -6,6 +6,7 @@ import math
 import copy
 
 arr = []
+arr_connects = []
 prev_arr = []
 anchor = [150, 200]
 anchor_default = [150, 200]
@@ -16,20 +17,26 @@ last_action = -1
 angle = 0
 
 
-def array_preparation(file):
-    global arr
+def array_preparation(file_dots, file_connects):
+    global arr, arr_connects
 
-    arr = file.readlines()
+    arr = file_dots.readlines()
     for i in range(len(arr)):
         arr[i] = arr[i].replace("\n", "")
         temp = arr[i].split(" ")
         arr[i] = [int(temp[0]), int(temp[1])]
+    
+    arr_connects = file_connects.readlines()
+    for i in range(len(arr_connects)):
+        arr_connects[i] = arr_connects[i].replace("\n", "")
+        temp = arr_connects[i].split(" ")
+        arr_connects[i] = [int(temp[0]), int(temp[1])]
 
 
-def create_drawing(arr, anchor):
+def create_drawing(arr, arr_connects, anchor):
     canvas.delete("all")
     create_dots(arr)
-    create_lines(arr)
+    create_lines(arr, arr_connects)
     canvas.create_oval(anchor[0] - 3, anchor[1] - 3, anchor[0] + 3, anchor[1] + 3, fill="#000fff000")
 
 
@@ -37,7 +44,7 @@ def create_dots(arr):
     for i in range(len(arr)):
         x, y = arr[i][0], arr[i][1]
         x1, y1, x2, y2 = (x - 2), (y - 2), (x + 2), (y + 2)
-        canvas.create_oval(x1, y1, x2, y2, fill="#000fff000")
+        #canvas.create_oval(x1, y1, x2, y2, fill="#000fff000")
 
 
 def create_block(arr, ind_prev, range1, range2):
@@ -48,30 +55,10 @@ def create_block(arr, ind_prev, range1, range2):
         prev = cur
 
 
-def create_lines(arr):
-    create_block(arr, 0, 1, 8)
-    create_line(arr, 2, 7)
-
-    create_block(arr, 1, 8, 16)
-    create_line(arr, 0, 15)
-
-    create_block(arr, 16, 17, 20)
-
-    create_block(arr, 20, 21, 26)
-
-    create_block(arr, 26, 27, 30)
-
-    create_block(arr, 30, 31, 33)
-    create_line(arr, 0, 30)
-    create_line(arr, 12, 32)
-    create_line(arr, 30, 32)
-
-    create_triangle(arr, 0, 33, 34)
-    create_triangle(arr, 28, 35, 29)
-    create_triangle(arr, 17, 36, 18)
-    create_triangle(arr, 10, 37, 9)
-    create_triangle(arr, 23, 38, 24)
-    create_triangle(arr, 5, 39, 4)
+def create_lines(arr, arr_connects):
+    for i in range(len(arr_connects)):
+        first, second = arr_connects[i][0], arr_connects[i][1]
+        canvas.create_line(arr[first][0], arr[first][1], arr[second][0], arr[second][1])
 
 
 def create_line(arr, ind1, ind2):
@@ -84,10 +71,10 @@ def create_triangle(arr, ind1, ind2, ind3):
 
 
 def perform_actions(action):
-    global arr, arr_default, anchor, angle, anchor_default, last_action, prev_dx, prev_dy, prev_scale_x, prev_scale_y, prev_anchor
+    global arr, arr_default, arr_connects, anchor, angle, anchor_default, last_action, prev_dx, prev_dy, prev_scale_x, prev_scale_y, prev_anchor
 
     if action == 0:
-        create_drawing(arr_default, anchor_default)
+        create_drawing(arr_default, arr_connects, anchor_default)
         prev_arr = copy.deepcopy(arr)
         prev_anchor = copy.deepcopy(anchor)
         arr = copy.deepcopy(arr_default)
@@ -110,7 +97,7 @@ def perform_actions(action):
             prev_dx = dx
             prev_dy = dy
         
-            create_drawing(arr, anchor)
+            create_drawing(arr, arr_connects, anchor)
         except:
             tkmb.showerror("Ошибка", "Координаты могут задаваться только целыми числами")
             entry_dx.delete(0, tk.END)
@@ -127,7 +114,7 @@ def perform_actions(action):
             anchor_x = int(anchor_x)
             anchor_y = int(anchor_y)
             anchor = [anchor_x, anchor_y]
-            create_drawing(arr, anchor)
+            create_drawing(arr, arr_connects, anchor)
         except:
             tkmb.showerror("Ошибка", "Координаты могут задаваться только целыми числами")
             entry_anchor_x.delete(0, tk.END)
@@ -147,7 +134,7 @@ def perform_actions(action):
                 tmp_y = (arr[i][0] - anchor[0]) * math.sin(angle) + (arr[i][1] - anchor[1]) * math.cos(angle) + anchor[1]
                 arr[i] = [tmp_x, tmp_y]
             
-            create_drawing(arr, anchor)
+            create_drawing(arr, arr_connects, anchor)
         except:
             tkmb.showerror("Ошибка", "Угол может задаваться только действительным числом")
             entry_angle.delete(0, tk.END)
@@ -170,7 +157,7 @@ def perform_actions(action):
             prev_scale_x = 1 / scale_x
             prev_scale_y = 1 / scale_y
             
-            create_drawing(arr, anchor)
+            create_drawing(arr, arr_connects, anchor)
         except:
             tkmb.showerror("Ошибка", "Масштабирование может задаваться только действительным числом")
             entry_scale_x.delete(0, tk.END)
@@ -209,7 +196,7 @@ def perform_actions(action):
         elif last_action == -1:
             tkmb.showinfo("Вернуть последнее действие", "Вернуть последнее действие можно только один раз")
         
-        create_drawing(arr, anchor)
+        create_drawing(arr, arr_connects, anchor)
         last_action = -1
 
     elif action == 6:
@@ -315,10 +302,12 @@ scale.grid(column=3, row=10, columnspan=2, sticky="ne")
 cancel.grid(column=3, row=12, columnspan=2, sticky="se", padx=5, pady=5)
 return_to_orig.grid(column=3, row=13, columnspan=2, sticky="se", padx=5, pady=5)
 
-f = open("dots.txt", "r")
-array_preparation(f)
+file_dots = open("dots.txt", "r")
+file_connects = open("connects.txt", "r")
+array_preparation(file_dots, file_connects)
 arr_default = copy.deepcopy(arr)
-create_drawing(arr, anchor)
-f.close()
+create_drawing(arr, arr_connects, anchor)
+file_dots.close()
+file_connects.close()
 
 window.mainloop()
