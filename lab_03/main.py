@@ -4,6 +4,73 @@ import tkinter.messagebox as tkmb
 import tkinter.ttk as ttk
 import math
 
+
+bg_colour = "#FFFFFF"
+line_colour = "#000000"
+algorithm = "Библиотечная"
+
+
+def set_default_colours_algorithms():
+    global dda_but, brensenham_float_but, brensenham_int_but, brensenham_grad_but, wu_but, library_but
+    
+    dda_but = tk.Button(window, text="Цифровой дифференциальный анализатор", width=45, command=lambda: perform_actions(1))
+    brensenham_float_but = tk.Button(window, text="Брезенхэм (вещественные)", width=45, command=lambda: perform_actions(2))
+    brensenham_int_but = tk.Button(window, text="Брезенхэм (целые)", width=45, command=lambda: perform_actions(3))
+    brensenham_grad_but = tk.Button(window, text="Брезенхэм (с устр. ступенчатости)", width=45, command=lambda: perform_actions(4))
+    wu_but = tk.Button(window, text="Ву", width=45, command=lambda: perform_actions(5))
+    library_but = tk.Button(window, text="Библиотечная", width=45, command=lambda: perform_actions(6))
+    
+    dda_but.grid(column=1, row=1, columnspan=8, sticky="ne")
+    brensenham_float_but.grid(column=1, row=2, columnspan=8, sticky="ne")
+    brensenham_int_but.grid(column=1, row=3, columnspan=8, sticky="ne")
+    brensenham_grad_but.grid(column=1, row=4, columnspan=8, sticky="ne")
+    wu_but.grid(column=1, row=5, columnspan=8, sticky="ne")
+    library_but.grid(column=1, row=6, columnspan=8, sticky="ne")
+
+
+def perform_actions(action):
+    global bg_colour, line_colour, algorithm
+    global dda_but, brensenham_float_but, brensenham_int_but, brensenham_grad_but, wu_but, library_but 
+    
+    cur_colour = "#FAE39E"
+    
+    if action == 1:
+        algorithm = "ЦДА"
+        set_default_colours_algorithms()
+        dda_but = tk.Button(window, text="Цифровой дифференциальный анализатор", bg=cur_colour, width=45, command=lambda: perform_actions(1))
+        dda_but.grid(column=1, row=1, columnspan=8, sticky="ne")
+    
+    elif action == 2:
+        algorithm = "Брезенхэм (вещественные)"
+        set_default_colours_algorithms()
+        brensenham_float_but = tk.Button(window, text="Брезенхэм (вещественные)", bg=cur_colour, width=45, command=lambda: perform_actions(2))
+        brensenham_float_but.grid(column=1, row=2, columnspan=8, sticky="ne")
+    
+    elif action == 3:
+        algorithm = "Брезенхэм (целые)"
+        set_default_colours_algorithms()
+        brensenham_int_but = tk.Button(window, text="Брезенхэм (целые)", bg=cur_colour, width=45, command=lambda: perform_actions(3))
+        brensenham_int_but.grid(column=1, row=3, columnspan=8, sticky="ne")
+        
+    elif action == 4:
+        algorithm = "Брезенхэм (с устр. ступенчаности)"
+        set_default_colours_algorithms()
+        brensenham_grad_but = tk.Button(window, text="Брезенхэм (с устр. ступенчатости)", bg=cur_colour, width=45, command=lambda: perform_actions(4))
+        brensenham_grad_but.grid(column=1, row=4, columnspan=8, sticky="ne")
+        
+    elif action == 5:
+        algorithm = "Ву"
+        set_default_colours_algorithms()
+        wu_but = tk.Button(window, text="Ву", bg=cur_colour, width=45, command=lambda: perform_actions(5))
+        wu_but.grid(column=1, row=5, columnspan=8, sticky="ne")
+    
+    elif action == 6:
+        algorithm = "Библиотечная"
+        set_default_colours_algorithms()
+        library_but = tk.Button(window, text="Библиотечная", bg=cur_colour, width=45, command=lambda: perform_actions(6))
+        library_but.grid(column=1, row=6, columnspan=8, sticky="ne")
+
+
 # Настройка основного окна
 window = tk.Tk()
 window.title("Лабораторная работа №3. Реализация и исследование алгоритмов построения отрезков.")
@@ -48,23 +115,23 @@ brensenham_float_but = tk.Button(window, text="Брезенхэм (вещест�
 brensenham_int_but = tk.Button(window, text="Брезенхэм (целые)", width=45, command=lambda: perform_actions(3))
 brensenham_grad_but = tk.Button(window, text="Брезенхэм (с устр. ступенчатости)", width=45, command=lambda: perform_actions(4))
 wu_but = tk.Button(window, text="Ву", width=45, command=lambda: perform_actions(5))
-library_but = tk.Button(window, text="Библиотечная", width=45, command=lambda: perform_actions(6))
+library_but = tk.Button(window, text="Библиотечная", bg="#FAE39E", width=45, command=lambda: perform_actions(6))
 
-white_colour_bg_but = tk.Button(window, width=3, bg="#FFFFFF", command=lambda: set_colour(1))
-yellow_colour_bg_but = tk.Button(window, width=3, bg="#FFFF00", command=lambda: set_colour(2))
-orange_colour_bg_but = tk.Button(window, width=3, bg="#FFA500", command=lambda: set_colour(3))
-red_colour_bg_but = tk.Button(window, width=3, bg="#FF0000", command=lambda: set_colour(4))
-green_colour_bg_but = tk.Button(window, width=3, bg="#00FF7F", command=lambda: set_colour(5))
-purple_colour_bg_but = tk.Button(window, width=3, bg="#8A2BE2", command=lambda: set_colour(6))
-black_colour_bg_but = tk.Button(window, width=3, bg="#000000", command=lambda: set_colour(7))
+white_colour_bg_but = tk.Button(window, width=3, bg="#FFFFFF", command=lambda: set_colour_bg(1))
+yellow_colour_bg_but = tk.Button(window, width=3, bg="#FFFF00", command=lambda: set_colour_bg(2))
+orange_colour_bg_but = tk.Button(window, width=3, bg="#FFA500", command=lambda: set_colour_bg(3))
+red_colour_bg_but = tk.Button(window, width=3, bg="#FF0000", command=lambda: set_colour_bg(4))
+green_colour_bg_but = tk.Button(window, width=3, bg="#00FF7F", command=lambda: set_colour_bg(5))
+purple_colour_bg_but = tk.Button(window, width=3, bg="#8A2BE2", command=lambda: set_colour_bg(6))
+black_colour_bg_but = tk.Button(window, width=3, bg="#000000", command=lambda: set_colour_bg(7))
 
-white_colour_line_but = tk.Button(window, width=3, bg="#FFFFFF", command=lambda: set_colour(1))
-yellow_colour_line_but = tk.Button(window, width=3, bg="#FFFF00", command=lambda: set_colour(2))
-orange_colour_line_but = tk.Button(window, width=3, bg="#FFA500", command=lambda: set_colour(3))
-red_colour_line_but = tk.Button(window, width=3, bg="#FF0000", command=lambda: set_colour(4))
-green_colour_line_but = tk.Button(window, width=3, bg="#00FF7F", command=lambda: set_colour(5))
-purple_colour_line_but = tk.Button(window, width=3, bg="#8A2BE2", command=lambda: set_colour(6))
-black_colour_line_but = tk.Button(window, width=3, bg="#000000", command=lambda: set_colour(7))
+white_colour_line_but = tk.Button(window, width=3, bg="#FFFFFF", command=lambda: set_colour_line(1))
+yellow_colour_line_but = tk.Button(window, width=3, bg="#FFFF00", command=lambda: set_colour_line(2))
+orange_colour_line_but = tk.Button(window, width=3, bg="#FFA500", command=lambda: set_colour_line(3))
+red_colour_line_but = tk.Button(window, width=3, bg="#FF0000", command=lambda: set_colour_line(4))
+green_colour_line_but = tk.Button(window, width=3, bg="#00FF7F", command=lambda: set_colour_line(5))
+purple_colour_line_but = tk.Button(window, width=3, bg="#8A2BE2", command=lambda: set_colour_line(6))
+black_colour_line_but = tk.Button(window, width=3, bg="#000000", command=lambda: set_colour_line(7))
 
 draw_line_but = tk.Button(window, text="Построить линию", width=45, command=lambda: perform_actions(7))
 draw_spectre_but = tk.Button(window, text="Построить спектр", width=45, command=lambda: perform_actions(8))
