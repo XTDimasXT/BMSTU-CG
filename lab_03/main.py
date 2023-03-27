@@ -11,21 +11,12 @@ algorithm = "Библиотечная"
 
 
 def set_default_colours_algorithms():
-    global dda_but, brensenham_float_but, brensenham_int_but, brensenham_grad_but, wu_but, library_but
-    
-    dda_but = tk.Button(window, text="Цифровой дифференциальный анализатор", width=45, command=lambda: perform_actions(1))
-    brensenham_float_but = tk.Button(window, text="Брезенхэм (вещественные)", width=45, command=lambda: perform_actions(2))
-    brensenham_int_but = tk.Button(window, text="Брезенхэм (целые)", width=45, command=lambda: perform_actions(3))
-    brensenham_grad_but = tk.Button(window, text="Брезенхэм (с устр. ступенчатости)", width=45, command=lambda: perform_actions(4))
-    wu_but = tk.Button(window, text="Ву", width=45, command=lambda: perform_actions(5))
-    library_but = tk.Button(window, text="Библиотечная", width=45, command=lambda: perform_actions(6))
-    
-    dda_but.grid(column=1, row=1, columnspan=8, sticky="ne")
-    brensenham_float_but.grid(column=1, row=2, columnspan=8, sticky="ne")
-    brensenham_int_but.grid(column=1, row=3, columnspan=8, sticky="ne")
-    brensenham_grad_but.grid(column=1, row=4, columnspan=8, sticky="ne")
-    wu_but.grid(column=1, row=5, columnspan=8, sticky="ne")
-    library_but.grid(column=1, row=6, columnspan=8, sticky="ne")
+    dda_but.config(bg="#F0F0F0")
+    brensenham_float_but.config(bg="#F0F0F0")
+    brensenham_int_but.config(bg="#F0F0F0")
+    brensenham_grad_but.config(bg="#F0F0F0")
+    wu_but.config(bg="#F0F0F0")
+    library_but.config(bg="#F0F0F0")
 
 
 def perform_actions(action):
@@ -69,7 +60,134 @@ def perform_actions(action):
         set_default_colours_algorithms()
         library_but = tk.Button(window, text="Библиотечная", bg=cur_colour, width=45, command=lambda: perform_actions(6))
         library_but.grid(column=1, row=6, columnspan=8, sticky="ne")
+        
+    elif action == 7:
+        if algorithm == "Библиотечная":
+            library_line(line_colour)
+    
+    elif action == 8:
+        if algorithm == "Библиотечная":
+            library_spectre(line_colour)
+    
+    elif action == 11:
+        clear_canvas()
 
+
+def set_colour_bg(action):
+    global canvas, bg_colour
+    
+    if action == 1:
+        canvas.config(bg="#FFFFFF")
+        bg_colour = "#FFFFFF"
+    
+    elif action == 2:
+        canvas.config(bg="#FFFF00")
+        bg_colour = "#FFFF00"
+    
+    elif action == 3:
+        canvas.config(bg="#FFA500")
+        bg_colour = "#FFA500"
+        
+    elif action == 4:
+        canvas.config(bg="#FF0000")
+        bg_colour = "#FF0000"
+    
+    elif action == 5:
+        canvas.config(bg="#00FF7F")
+        bg_colour = "#00FF7F"
+    
+    elif action == 6:
+        canvas.config(bg="#8A2BE2")
+        bg_colour = "#8A2BE2"
+    
+    elif action == 7:
+        canvas.config(bg="#000000")
+        bg_colour = "#000000"
+
+
+def set_colour_line(action):
+    global line_colour
+    
+    if action == 1:
+        line_colour = "#FFFFFF"
+    
+    elif action == 2:
+        line_colour = "#FFFF00"
+    
+    elif action == 3:
+        line_colour = "#FFA500"
+        
+    elif action == 4:
+        line_colour = "#FF0000"
+    
+    elif action == 5:
+        line_colour = "#00FF7F"
+    
+    elif action == 6:
+        line_colour = "#8A2BE2"
+    
+    elif action == 7:
+        line_colour = "#000000"
+        
+
+def clear_canvas():
+    canvas.delete("all")
+    
+
+def clear_line_entries():
+    entry_x0.delete(0, tk.END)
+    entry_y0.delete(0, tk.END)
+    entry_x1.delete(0, tk.END)
+    entry_y1.delete(0, tk.END)
+
+
+def clear_spectre_entries():
+    entry_xs.delete(0, tk.END)
+    entry_ys.delete(0, tk.END)
+    entry_angle.delete(0, tk.END)
+    entry_line_length.delete(0, tk.END)
+
+
+def library_line(line_colour):
+    x0 = entry_x0.get()
+    y0 = entry_y0.get()
+    x1 = entry_x1.get()
+    y1 = entry_x1.get()
+    
+    try:
+        x0, y0, x1, y1 = float(x0), float(y0), float(x1), float(y1)
+        canvas.create_line(x0, y0, x1, y1, fill=line_colour)
+    except:
+        tkmb.showerror("Ошибка ввода", "Переданы некорректные значения")
+        clear_line_entries()
+        return 1
+
+
+def library_spectre(line_colour):
+    xs = entry_xs.get()
+    ys = entry_ys.get()
+    angle = entry_angle.get()
+    length = entry_line_length.get()
+    
+    try:
+        xs, ys, angle, length = float(xs), float(ys), float(angle), float(length)
+        count = 360 // angle
+        angle = angle * math.pi / 180
+        
+        i = 0
+        while i < 2 * math.pi:
+            xs_new = xs + math.cos(i) * length
+            ys_new = ys - math.sin(i) * length
+            canvas.create_line(xs, ys, xs_new, ys_new, fill=line_colour)
+            i += angle
+    except ValueError:
+        tkmb.showerror("Ошибка ввода", "Переданы некорректные значения")
+        clear_spectre_entries()
+        return 1
+    except ZeroDivisionError:
+        tkmb.showerror("Ошибка ввода", "Угол не может быть равен 0")
+        clear_spectre_entries()
+        return 1
 
 # Настройка основного окна
 window = tk.Tk()
@@ -77,7 +195,7 @@ window.title("Лабораторная работа №3. Реализация �
 window.geometry("1550x860")
 
 # Поле для рисования
-canvas = tk.Canvas(window, width=1155, height=780, bg="white")
+canvas = tk.Canvas(window, width=1155, height=770, bg=bg_colour)
 
 # Текст
 cur_font = "Helvetica 10"
@@ -87,25 +205,30 @@ tmp_2 = " " * 23
 tmp_3 = " " * 16
 tmp_4 = " " * 25
 tmp_5 = " " * 5
+tmp_6 = " " * 2
 
 label_available_algorithms = tk.Label(text="ДОСТУПНЫЕ АЛГОРИТМЫ {}".format(tmp_1), font=main_font)
 label_colour_choose = tk.Label(text="ВЫБОР ЦВЕТА {}".format(tmp_2), font=main_font)
-label_colour_background = tk.Label(text="Цвет фона:", font=cur_font)
-label_colour_line = tk.Label(text="Цвет линий:", font=cur_font)
+label_colour_background = tk.Label(text="Цвет фона", font=cur_font)
+label_colour_line = tk.Label(text="Цвет линий", font=cur_font)
 label_line_construction = tk.Label(text="ПОСТРОЕНИЕ ЛИНИЙ {}".format(tmp_3), font=main_font)
 label_line_x0 = tk.Label(text="x0 {}".format(tmp_5), font=cur_font)
 label_line_y0 = tk.Label(text="y0 {}".format(tmp_5), font=cur_font)
 label_line_x1 = tk.Label(text="x1 {}".format(tmp_5), font=cur_font)
 label_line_y1 = tk.Label(text="y1 {}".format(tmp_5), font=cur_font)
-label_angle = tk.Label(text="Угол поворота (°):", font=cur_font)
+label_line_xs = tk.Label(text="xc {}".format(tmp_5), font=cur_font)
+label_line_ys = tk.Label(text="yc {}".format(tmp_5), font=cur_font)
+label_angle = tk.Label(text="Угол поворота (°) {}".format(tmp_6), font=cur_font)
 label_compare_lines = tk.Label(text="СРАВНЕНИЯ {}".format(tmp_4), font=main_font)
-label_line_length=tk.Label(text="Длина линии:", font=cur_font)
+label_line_length=tk.Label(text="Длина линии {}".format(tmp_5), font=cur_font)
 
 # Поля ввода
 entry_x0 = tk.Entry(width=11)
 entry_y0 = tk.Entry(width=11)
 entry_x1 = tk.Entry(width=11)
 entry_y1 = tk.Entry(width=11)
+entry_xs = tk.Entry(width=11)
+entry_ys = tk.Entry(width=11)
 entry_angle = tk.Entry(width=22)
 entry_line_length=tk.Entry(width=22)
 
@@ -149,7 +272,7 @@ menu.add_command(label="О программе", command=lambda: perform_actions(
 menu.add_command(label="Об авторе", command=lambda: perform_actions(14))
 
 # Размещение
-canvas.grid(column=0, row=0, rowspan=23, sticky="w")
+canvas.grid(column=0, row=0, rowspan=24, sticky="w")
 
 ## Алгоритмы
 label_available_algorithms.grid(column=1, row=0, columnspan=8, sticky="ne")
@@ -194,20 +317,25 @@ entry_y0.grid(column=3, row=12, columnspan=2, sticky="ne", padx=5)
 entry_x1.grid(column=5, row=12, columnspan=2, sticky="ne", padx=5)
 entry_y1.grid(column=7, row=12, columnspan=2, sticky="ne", padx=5)
 
-label_angle.grid(column=1, row=13, columnspan=4, sticky="ne", padx=5, pady=5)
-entry_angle.grid(column=5, row=13, columnspan=4, sticky="ne", padx=5, pady=5)
+label_line_xs.grid(column=1, row=14, columnspan=2, sticky="ne", padx=5, pady=5)
+label_line_ys.grid(column=3, row=14, columnspan=2, sticky="ne", padx=5, pady=5)
+label_angle.grid(column=5, row=14, columnspan=4, sticky="ne", padx=5, pady=5)
 
-draw_line_but.grid(column=1, row=14, columnspan=8, sticky="ne")
-draw_spectre_but.grid(column=1, row=15, columnspan=8, sticky="ne")
+entry_xs.grid(column=1, row=15, columnspan=2, sticky="ne", padx=5)
+entry_ys.grid(column=3, row=15, columnspan=2, sticky="ne", padx=5)
+entry_angle.grid(column=5, row=15, columnspan=4, sticky="ne", padx=5)
 
-## Сравнение времени + очистка + возврат
-label_compare_lines.grid(column=1, row=16, columnspan=8, sticky="ne", padx=5, pady=5)
-label_line_length.grid(column=1, row=17, columnspan=4, sticky="ne", padx=5, pady=5)
-entry_line_length.grid(column=5, row=17, columnspan=4, sticky="ne", padx=5, pady=5)
+label_line_length.grid(column=1, row=16, columnspan=4, sticky="ne", padx=5, pady=5)
+entry_line_length.grid(column=5, row=16, columnspan=4, sticky="ne", padx=5, pady=5)
 
-compare_time_but.grid(column=1, row=18, columnspan=8, sticky="ne")
-compare_gradation_but.grid(column=1, row=19, columnspan=8, sticky="ne", pady=(0,20))
-clear_but.grid(column=1, row=20, columnspan=8, sticky="ne")
-return_but.grid(column=1, row=21, columnspan=8, sticky="ne")
+draw_line_but.grid(column=1, row=13, columnspan=8, sticky="ne")
+draw_spectre_but.grid(column=1, row=17, columnspan=8, sticky="ne")
+
+## Сравнение времени + очистка + возврат действия
+label_compare_lines.grid(column=1, row=18, columnspan=8, sticky="ne", padx=5, pady=5)
+compare_time_but.grid(column=1, row=19, columnspan=8, sticky="ne")
+compare_gradation_but.grid(column=1, row=20, columnspan=8, sticky="ne", pady=(0, 20))
+clear_but.grid(column=1, row=21, columnspan=8, sticky="ne")
+return_but.grid(column=1, row=22, columnspan=8, sticky="ne")
 
 window.mainloop()
