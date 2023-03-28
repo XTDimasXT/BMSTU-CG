@@ -4,6 +4,10 @@ import tkinter.messagebox as tkmb
 import tkinter.ttk as ttk
 import math
 
+from brensenham import *
+from dda import *
+from wu import *
+
 
 bg_colour = "#FFFFFF"
 line_colour = "#000000"
@@ -17,6 +21,22 @@ def set_default_colours_algorithms():
     brensenham_grad_but.config(bg="#F0F0F0")
     wu_but.config(bg="#F0F0F0")
     library_but.config(bg="#F0F0F0")
+
+
+def draw_line_by_algorithm(canvas, points):
+    for point in points:
+        canvas.create_line(point[0], point[1], point[0] + 1, point[1], fill=point[2])
+
+
+def draw_spectre_by_algorithm(canvas, algorithm, xs, ys, angle, length, line_colour):
+    if algorithm == "ЦДА":
+        i = 0
+        while i < 2 * math.pi:
+            xs_new = xs + math.cos(i) * length
+            ys_new = ys - math.sin(i) * length
+            points = dda_line(xs, ys, xs_new, ys_new, line_colour)
+            draw_line_by_algorithm(canvas, points)
+            i += angle
 
 
 def perform_actions(action):
@@ -62,12 +82,50 @@ def perform_actions(action):
         library_but.grid(column=1, row=6, columnspan=8, sticky="ne")
         
     elif action == 7:
+        x0 = entry_x0.get()
+        y0 = entry_y0.get()
+        x1 = entry_x1.get()
+        y1 = entry_x1.get()
+    
+        try:
+            x0, y0, x1, y1 = float(x0), float(y0), float(x1), float(y1)
+        except:
+            tkmb.showerror("Ошибка ввода", "Переданы некорректные значения")
+            clear_line_entries()
+            return 1
+        
         if algorithm == "Библиотечная":
-            library_line(line_colour)
+            library_line(x0, y0, x1, y1, line_colour)
+            
+        elif algorithm == "ЦДА":
+            points = dda_line(x0, y0, x1, y1, line_colour)
+            draw_line_by_algorithm(canvas, points)
     
     elif action == 8:
+        xs = entry_xs.get()
+        ys = entry_ys.get()
+        angle = entry_angle.get()
+        length = entry_line_length.get()
+        
+        try:
+            xs, ys, angle, length = float(xs), float(ys), float(angle), float(length)
+            count = 360 // angle
+            angle = angle * math.pi / 180
+        except ValueError:
+            tkmb.showerror("Ошибка ввода", "Переданы некорректные значения")
+            clear_spectre_entries()
+            return 1
+        except ZeroDivisionError:
+            tkmb.showerror("Ошибка ввода", "Угол не может быть равен 0")
+            clear_spectre_entries()
+            return 1
+        
         if algorithm == "Библиотечная":
-            library_spectre(line_colour)
+            library_spectre(xs, ys, angle, length, line_colour)
+            
+        elif algorithm == "ЦДА":
+            draw_spectre_by_algorithm(canvas, "ЦДА", xs, ys, angle, length, line_colour)
+        
     
     elif action == 11:
         clear_canvas()
@@ -148,46 +206,18 @@ def clear_spectre_entries():
     entry_line_length.delete(0, tk.END)
 
 
-def library_line(line_colour):
-    x0 = entry_x0.get()
-    y0 = entry_y0.get()
-    x1 = entry_x1.get()
-    y1 = entry_x1.get()
-    
-    try:
-        x0, y0, x1, y1 = float(x0), float(y0), float(x1), float(y1)
-        canvas.create_line(x0, y0, x1, y1, fill=line_colour)
-    except:
-        tkmb.showerror("Ошибка ввода", "Переданы некорректные значения")
-        clear_line_entries()
-        return 1
+def library_line(x0, y0, x1, y1, line_colour):
+    canvas.create_line(x0, y0, x1, y1, fill=line_colour)
 
 
-def library_spectre(line_colour):
-    xs = entry_xs.get()
-    ys = entry_ys.get()
-    angle = entry_angle.get()
-    length = entry_line_length.get()
-    
-    try:
-        xs, ys, angle, length = float(xs), float(ys), float(angle), float(length)
-        count = 360 // angle
-        angle = angle * math.pi / 180
-        
-        i = 0
-        while i < 2 * math.pi:
-            xs_new = xs + math.cos(i) * length
-            ys_new = ys - math.sin(i) * length
-            canvas.create_line(xs, ys, xs_new, ys_new, fill=line_colour)
-            i += angle
-    except ValueError:
-        tkmb.showerror("Ошибка ввода", "Переданы некорректные значения")
-        clear_spectre_entries()
-        return 1
-    except ZeroDivisionError:
-        tkmb.showerror("Ошибка ввода", "Угол не может быть равен 0")
-        clear_spectre_entries()
-        return 1
+def library_spectre(xs, ys, angle, length, line_colour):
+    i = 0
+    while i < 2 * math.pi:
+        xs_new = xs + math.cos(i) * length
+        ys_new = ys - math.sin(i) * length
+        canvas.create_line(xs, ys, xs_new, ys_new, fill=line_colour)
+        i += angle
+
 
 # Настройка основного окна
 window = tk.Tk()
