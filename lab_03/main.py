@@ -37,6 +37,33 @@ def draw_spectre_by_algorithm(canvas, algorithm, xs, ys, angle, length, line_col
             points = dda_line(xs, ys, xs_new, ys_new, line_colour)
             draw_line_by_algorithm(canvas, points)
             i += angle
+    
+    elif algorithm == "Брезенхэм (вещественные)":
+        i = 0
+        while i < 2 * math.pi:
+            xs_new = xs + math.cos(i) * length
+            ys_new = ys - math.sin(i) * length
+            points = brensenham_float_line(xs, ys, xs_new, ys_new, line_colour)
+            draw_line_by_algorithm(canvas, points)
+            i += angle
+    
+    elif algorithm == "Брезенхэм (целые)":
+        i = 0
+        while i < 2 * math.pi:
+            xs_new = xs + math.cos(i) * length
+            ys_new = ys - math.sin(i) * length
+            points = brensenham_integer_line(xs, ys, xs_new, ys_new, line_colour)
+            draw_line_by_algorithm(canvas, points)
+            i += angle
+    
+    elif algorithm == "Брезенхэм (с устр. ступенчатости)":
+        i = 0
+        while i < 2 * math.pi:
+            xs_new = xs + math.cos(i) * length
+            ys_new = ys - math.sin(i) * length
+            points = brensenham_smooth_line(canvas, xs, ys, xs_new, ys_new, line_colour)
+            draw_line_by_algorithm(canvas, points)
+            i += angle
 
 
 def perform_actions(action):
@@ -100,6 +127,18 @@ def perform_actions(action):
         elif algorithm == "ЦДА":
             points = dda_line(x0, y0, x1, y1, line_colour)
             draw_line_by_algorithm(canvas, points)
+        
+        elif algorithm == "Брезенхэм (вещественные)":
+            points = brensenham_float_line(x0, y0, x1, y1, line_colour)
+            draw_line_by_algorithm(canvas, points)
+        
+        elif algorithm == "Брезенхэм (целые)":
+            points = brensenham_integer_line(x0, y0, x1, y1, line_colour)
+            draw_line_by_algorithm(canvas, points)
+        
+        elif algorithm == "Брезенхэм (с устр. ступенчатости)":
+            points = brensenham_smooth_line(canvas, x0, y0, x1, y1, line_colour)
+            draw_line_by_algorithm(canvas, points)
     
     elif action == 8:
         xs = entry_xs.get()
@@ -109,7 +148,6 @@ def perform_actions(action):
         
         try:
             xs, ys, angle, length = float(xs), float(ys), float(angle), float(length)
-            count = 360 // angle
             angle = angle * math.pi / 180
         except ValueError:
             tkmb.showerror("Ошибка ввода", "Переданы некорректные значения")
@@ -125,6 +163,15 @@ def perform_actions(action):
             
         elif algorithm == "ЦДА":
             draw_spectre_by_algorithm(canvas, "ЦДА", xs, ys, angle, length, line_colour)
+        
+        elif algorithm == "Брезенхэм (вещественные)":
+            draw_spectre_by_algorithm(canvas, "Брезенхэм (вещественные)", xs, ys, angle, length, line_colour)
+            
+        elif algorithm == "Брезенхэм (целые)":
+            draw_spectre_by_algorithm(canvas, "Брезенхэм (целые)", xs, ys, angle, length, line_colour)
+            
+        elif algorithm == "Брезенхэм (с устр. ступечатости)":
+            draw_spectre_by_algorithm(canvas, "Брезенхэм (с устр. ступенчаности)", xs, ys, angle, length, line_colour)
         
     
     elif action == 11:
