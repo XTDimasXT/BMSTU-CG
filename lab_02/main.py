@@ -159,7 +159,7 @@ def perform_actions(action):
             
             create_drawing(arr, arr_connects, anchor)
         except:
-            tkmb.showerror("Ошибка", "Масштабирование может задаваться только действительным числом")
+            tkmb.showerror("Ошибка", "Масштабирование может задаваться только действительным числом (кроме 0)")
             entry_scale_x.delete(0, tk.END)
             entry_scale_y.delete(0, tk.END)
         
