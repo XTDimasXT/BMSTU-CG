@@ -1,3 +1,4 @@
+from algorithms import CAP_algorithm_with_ordered_list_of_edges, Point
 import tkinter as tk
 from tkinter import colorchooser, messagebox
 from constants import *
@@ -15,6 +16,82 @@ def clearScreen():
     currentFigure.clear()
     listPoint_scroll.delete(0, tk.END)
     canvasField.delete("all")
+
+def fill_all_figures():
+    if not allFigures and not currentFigure:
+        messagebox.showwarning("Предупреждение!", "Фигура не введена для закраски!")
+    elif not allFigures and  currentFigure:
+        messagebox.showwarning("Предупреждение!", "Фигура не замкнута для закраски!")
+    else:
+        delay = False
+        if methodDraw.get() == 0:
+            delay = True
+        time_start = time.time()
+        CAP_algorithm_with_ordered_list_of_edges(canvasField, allFigures, colour=LINE_COLOUR, delay=delay)
+        time_end = time.time() - time_start
+        if round(time_end * 1000, 2) < 1000:
+            timeLabel["text"] = "Время закраски: " + str(round(time_end * 1000, 2)) + " mc."
+        else:
+            timeLabel["text"] = "Время закраски: " + str(round(time_end, 2)) + " c."
+
+
+def get_point():
+    x = xEntry.get()
+    y = yEntry.get()
+    if not x or not y:
+        messagebox.showinfo("Предупреждение!", "Координаты точек не введены!")
+    else:
+        try:
+            x = int(x)
+            y = int(y)
+        except ValueError:
+            messagebox.showinfo("Предупреждение!", "Координаты точек должны быть только целые!")
+            return
+        add_point(x, y)
+
+
+def close_figure():
+    global currentFigure
+    if len(currentFigure) > 2:
+        canvasField.create_line(currentFigure[-1].x, currentFigure[-1].y, currentFigure[0].x, currentFigure[0].y)
+
+        index = findIndexForListPointScroll(allFigures, currentFigure)
+        listPoint_scroll.insert(index, "------------Closed------------")
+
+        allFigures.append(currentFigure)
+        currentFigure = []
+    elif len(currentFigure) == 0:
+        messagebox.showwarning("Предупреждение!", "Точки фигуры не введены!")
+    else:
+        messagebox.showwarning("Предупреждение!", "Такую фигуру нельзя замкнуть!\nНеобходимо как минимум, чтобы у фигуры было 3 точки!")
+
+
+def findIndexForListPointScroll(allArraysFigure, currentArray):
+    index = 0
+
+    for pointFigure in allArraysFigure:
+         index += len(pointFigure) + 1
+
+    index += len(currentArray)
+    return index
+
+
+def add_point(x, y):
+    if Point(x, y) not in currentFigure:
+        # canvasField.create_text(x, y - 10, text=(str(x) + " " + str(y)))
+        if currentFigure:
+            canvasField.create_line(currentFigure[-1].x, currentFigure[-1].y, x, y)
+
+        index = findIndexForListPointScroll(allFigures, currentFigure)
+        listPoint_scroll.insert(index,  "{:3d}) X = {:4d}; Y = {:4d}".format(index + 1, x, y))
+        currentFigure.append(Point(x, y))
+    else:
+        messagebox.showwarning("Предупреждение!", "Точка с такими координатами фигуры уже введена!")
+
+
+def add_point_figure_onClick(event):
+    x, y = event.x,  event.y
+    add_point(x, y)
 
 
 dataFrame = tk.Frame(root, width=DATA_FRAME_WIGHT, height=DATA_FRAME_HEIGHT)
@@ -112,6 +189,10 @@ msgAboutPoint = tk.Label(dataFrame, bg=MAIN_FRAME_COLOR, text="X       Y",
 xEntry = tk.Entry(dataFrame, bg=MAIN_COLOUR_LABEL_BG, font=("Consolas", 14), fg=MAIN_COLOUR_LABEL_TEXT, justify="center")
 yEntry = tk.Entry(dataFrame, bg=MAIN_COLOUR_LABEL_BG, font=("Consolas", 14), fg=MAIN_COLOUR_LABEL_TEXT, justify="center")
 
+drawPointBtn = tk.Button(dataFrame, bg=MAIN_COLOUR, fg=MAIN_COLOUR_LABEL_TEXT, text="Построить точку", font=("Consolas", 14),
+                         command=get_point)
+drawCloseBtn = tk.Button(dataFrame, bg=MAIN_COLOUR, fg=MAIN_COLOUR_LABEL_TEXT, text="Замкнуть фигуру", font=("Consolas", 14),
+                         command=close_figure)
 
 makePoint = modeDraw + 2.1
 pointMakeLabel.place(x=0, y=makePoint * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT, height=DATA_FRAME_HEIGHT // COLUMNS)
@@ -121,6 +202,8 @@ xEntry.place(x=DATA_FRAME_WIGHT // 4, y=(makePoint + 2) * DATA_FRAME_HEIGHT // C
 yEntry.place(x=2 * DATA_FRAME_WIGHT // 4, y=(makePoint + 2) * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT // 4, height=DATA_FRAME_HEIGHT // COLUMNS)
 
 makePoint += 0.2
+drawPointBtn.place(x=10, y=(makePoint + 3) * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT // 2, height=DATA_FRAME_HEIGHT // COLUMNS)
+drawCloseBtn.place(x=DATA_FRAME_WIGHT // 2, y=(makePoint + 3) * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT // 2 - 10, height=DATA_FRAME_HEIGHT // COLUMNS)
 
 listPoint_scroll = tk.Listbox(font=("Consolas", 14))
 makePoint += 0.4
@@ -144,15 +227,19 @@ allFigures = []
 canvasField = tk.Canvas(root, bg=CANVAS_COLOUR)
 canvasField.place(x=WINDOW_WIDTH * DATA_SITUATION + BORDERS_SPACE, y=BORDERS_SPACE, width=CANVAS_WIDTH, height=CANVAS_HEIGHT)
 
+canvasField.bind("<Button-1>", add_point_figure_onClick)
+canvasField.bind("<Button-3>", lambda event: close_figure())
 
 timeLabel = tk.Label(root, bg="gray", text="Время закраски: ",
                              font=("Consolas", 16),
                              fg=MAIN_COLOUR_LABEL_TEXT)
+fillingBtn = tk.Button(dataFrame, bg=MAIN_COLOUR, fg=MAIN_COLOUR_LABEL_TEXT, text="Выполнить закраску", font=("Consolas", 14), command=fill_all_figures)
 clearCanvasBtn = tk.Button(dataFrame, bg=MAIN_COLOUR, fg=MAIN_COLOUR_LABEL_TEXT, text="Очистить экран", font=("Consolas", 14), command=clearScreen)
 infoBtn = tk.Button(dataFrame, bg=MAIN_COLOUR, fg=MAIN_COLOUR_LABEL_TEXT, text="Справка", font=("Consolas", 14),
                     command=show_info)
 
 timeLabel.place(x=DATA_FRAME_WIGHT + 2 * BORDERS_SPACE, y=CANVAS_HEIGHT + BORDERS_SPACE - DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT - 60, height=DATA_FRAME_HEIGHT // COLUMNS)
+fillingBtn.place(x=40, y=(modeMouse + 3) * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT - 80, height=DATA_FRAME_HEIGHT // COLUMNS)
 clearCanvasBtn.place(x=40, y=(modeMouse + 4) * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT - 80, height=DATA_FRAME_HEIGHT // COLUMNS)
 infoBtn.place(x=40, y=(modeMouse + 5) * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT - 80, height=DATA_FRAME_HEIGHT // COLUMNS)
 
