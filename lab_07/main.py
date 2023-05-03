@@ -3,6 +3,7 @@ from tkinter import colorchooser, messagebox
 
 from constants import *
 from draw import add_line, draw_rectangle, click_right, draw_rectangle_by_Button
+from algorithms import sutherland_cohen_algorithm
 
 root = tk.Tk()
 root.title("Лабораторная работа №7. Реализация алгоритма отсечения отрезка регулярным отсекателем")
@@ -18,6 +19,22 @@ is_set_rectangle = False
 def click_left_motion(event):
     global is_set_rectangle
     is_set_rectangle = draw_rectangle_by_Button(event, rectangle, lines, canvasField, CLIPPER_COLOUR, is_set_rectangle)
+
+
+def cut_off_command():
+    if rectangle[0] == -1:
+        messagebox.showinfo("Ошибка", "Отсутствует отсекатель")
+
+    rect = [min(rectangle[0], rectangle[2]), max(rectangle[0], rectangle[2]),
+            min(rectangle[1], rectangle[3]), max(rectangle[1], rectangle[3])]
+
+    canvasField.create_rectangle(rect[0] + 1, rect[2] + 1, rect[1] - 1, rect[3] - 1, fill=CANVAS_COLOUR, outline=CANVAS_COLOUR)
+
+    for line in lines:
+        if line:
+            pr, n_line = sutherland_cohen_algorithm(rect, line)
+            if pr == 1 or pr == 0:
+                canvasField.create_line(n_line[0][0], n_line[0][1], n_line[1][0], n_line[1][1], fill=RESULT_COLOUR)
 
 
 def clear_canvas():
@@ -37,6 +54,64 @@ def show_info():
                         '========Инструкции для пользователя:========\n'
                         'С помощью левой кнопки мыши мы добавляем отсекатель (прямоугольник), с помощью правой - добавляем отрезок.\n')
 
+
+def drawLine():
+    xStart = xnEntry.get()
+    yStart = ynEntry.get()
+    xEnd = xkEntry.get()
+    yEnd = ykEntry.get()
+
+    if not xStart or not yStart:
+        messagebox.showwarning('Ошибка ввода', 'Не заданы координаты начала отрезка!')
+    elif not xEnd or not yEnd:
+        messagebox.showwarning('Ошибка ввода', 'Не заданы координаты конца отрезка!')
+    else:
+        try:
+            xStart, yStart = int(xStart), int(yStart)
+            xEnd, yEnd = int(xEnd), int(yEnd)
+        except all:
+            messagebox.showwarning('Ошибка ввода', 'Координаты заданы неверно!')
+            return
+
+        add_line(canvasField, lines, xStart, yStart, xEnd, yEnd, LINE_COLOUR)
+
+
+def add_vert_horiz_lines(rectangle, lines, canvas, colour):
+    if rectangle[0] == -1:
+        messagebox.showerror("Ошибка", "Отсутствует отсекатель")
+        return
+
+    x1 = rectangle[0]
+    y1 = rectangle[1]
+    x2 = rectangle[2]
+    y2 = rectangle[3]
+
+    dy = y2 - y1
+    dx = x2 - x1
+
+    lines.append([[x1, y1 + 0.1 * dy], [x1, y2 - 0.1 * dy], colour])
+    lines.append([[x1 + 0.1 * dx, y1], [x2 - 0.1 * dx, y1], colour])
+
+    canvas.create_line(x1, y1 + 0.1 * dy, x1, y2 - 0.1 * dy, fill=colour)
+    canvas.create_line(x1 + 0.1 * dx, y1, x2 - 0.1 * dx, y1, fill=colour)
+
+
+def drawClipper():
+    try:
+        xl = int(xlbEntry.get())
+        yl = int(ylbEntry.get())
+        xr = int(xrlEntry.get())
+        yr = int(yrlEntry.get())
+    except:
+        messagebox.showwarning("Ошибка ввода", "Неверно заданны координаты вершин прямоугольника!\n" "Ожидался ввод целых чисел.")
+        return
+
+    rectangle[0] = xl
+    rectangle[1] = yl
+    rectangle[2] = xr
+    rectangle[3] = yr
+
+    draw_rectangle(canvasField, rectangle, lines, CLIPPER_COLOUR)
 
 
 dataFrame = tk.Frame(root, width=DATA_FRAME_WIGHT, height=DATA_FRAME_HEIGHT)
@@ -174,6 +249,8 @@ ynEntry = tk.Entry(dataFrame, bg=MAIN_COLOUR_LABEL_TEXT, font=("Consolas", 14), 
 xkEntry = tk.Entry(dataFrame, bg=MAIN_COLOUR_LABEL_TEXT, font=("Consolas", 14), fg=MAIN_FRAME_COLOR, justify="center")
 ykEntry = tk.Entry(dataFrame, bg=MAIN_COLOUR_LABEL_TEXT, font=("Consolas", 14), fg=MAIN_FRAME_COLOR, justify="center")
 
+drawLineBtn = tk.Button(dataFrame, bg=MAIN_COLOUR, fg=MAIN_COLOUR_LABEL_TEXT, text="Построить отрезок", font=("Consolas", 14), command=drawLine)
+
 
 makePoint = yColourLine + 3.1
 pointMakeLabel.place(x=0, y=makePoint * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT, height=DATA_FRAME_HEIGHT // COLUMNS)
@@ -185,6 +262,7 @@ xkEntry.place(x=2 * DATA_FRAME_WIGHT // 4, y=(makePoint + 2) * DATA_FRAME_HEIGHT
 ykEntry.place(x=3 * DATA_FRAME_WIGHT // 4, y=(makePoint + 2) * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT // 4 - 5, height=DATA_FRAME_HEIGHT // COLUMNS)
 
 makePoint += 0.2
+drawLineBtn.place(x=DATA_FRAME_WIGHT // 6, y=(makePoint + 3) * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT // 1.5, height=DATA_FRAME_HEIGHT // COLUMNS)
 
 
 clipperMakeLabel = tk.Label(dataFrame, bg=MAIN_COLOUR_LABEL_BG, text="ПОСТРОЕНИЕ ОТСЕКАТЕЛЯ", font=("Consolas", 16), fg=MAIN_COLOUR_LABEL_TEXT, relief=tk.SOLID)
@@ -196,6 +274,9 @@ ylbEntry = tk.Entry(dataFrame, bg=MAIN_COLOUR_LABEL_TEXT, font=("Consolas", 14),
 xrlEntry = tk.Entry(dataFrame, bg=MAIN_COLOUR_LABEL_TEXT, font=("Consolas", 14), fg=MAIN_FRAME_COLOR, justify="center")
 yrlEntry = tk.Entry(dataFrame, bg=MAIN_COLOUR_LABEL_TEXT, font=("Consolas", 14), fg=MAIN_FRAME_COLOR, justify="center")
 
+drawClipperBtn = tk.Button(dataFrame, bg=MAIN_COLOUR, fg=MAIN_COLOUR_LABEL_TEXT, text="Построить отсекатель", font=("Consolas", 14), command=drawClipper)
+
+
 makeClipper = makePoint + 4.1
 clipperMakeLabel.place(x=0, y=makeClipper * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT, height=DATA_FRAME_HEIGHT // COLUMNS)
 msgAboutClipper.place(x=0, y=(makeClipper + 1) * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT, height=DATA_FRAME_HEIGHT // COLUMNS)
@@ -206,6 +287,7 @@ xrlEntry.place(x=2 * DATA_FRAME_WIGHT // 4, y=(makeClipper + 2) * DATA_FRAME_HEI
 yrlEntry.place(x=3 * DATA_FRAME_WIGHT // 4, y=(makeClipper + 2) * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT // 4 - 5, height=DATA_FRAME_HEIGHT // COLUMNS)
 
 makeClipper += 0.2
+drawClipperBtn.place(x=DATA_FRAME_WIGHT // 6, y=(makeClipper + 3) * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT // 1.5, height=DATA_FRAME_HEIGHT // COLUMNS)
 
 modeByMouse = tk.Label(dataFrame, bg=MAIN_COLOUR_LABEL_BG, text="ПОСТРОЕНИЕ С ПОМОЩЬЮ МЫШИ", font=("Consolas", 16), fg=MAIN_COLOUR_LABEL_TEXT, relief=tk.SOLID)
 modeMouse = makeClipper + 4 + 0.2
@@ -221,9 +303,15 @@ canvasField.bind("<Button-3>", lambda event: click_right(event, lines, canvasFie
 canvasField.bind("<B1-Motion>", lambda event: click_left_motion(event))
 
 
+addLineBtn = tk.Button(dataFrame, bg=MAIN_COLOUR, fg=MAIN_COLOUR_LABEL_TEXT, text="Добавить горизонтальные и \nвертикальные отрезки", font=("Consolas", 14),
+                       command=lambda: add_vert_horiz_lines(rectangle, lines, canvasField, LINE_COLOUR))
+cutBtn = tk.Button(dataFrame, bg=MAIN_COLOUR, fg=MAIN_COLOUR_LABEL_TEXT, text="Отсечь", font=("Consolas", 14), command=cut_off_command)
+
 clearCanvasBtn = tk.Button(dataFrame, bg=MAIN_COLOUR, fg=MAIN_COLOUR_LABEL_TEXT, text="Очистить экран", font=("Consolas", 14), command=clear_canvas)
 infoBtn = tk.Button(dataFrame, bg=MAIN_COLOUR, fg=MAIN_COLOUR_LABEL_TEXT, text="Справка", font=("Consolas", 14), command=show_info)
 
+addLineBtn.place(x=40, y=(modeMouse + 1) * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT - 80, height=2 * DATA_FRAME_HEIGHT // COLUMNS)
+cutBtn.place(x=40, y=(modeMouse + 3) * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT - 80, height=DATA_FRAME_HEIGHT // COLUMNS)
 clearCanvasBtn.place(x=40, y=(modeMouse + 4) * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT - 80, height=DATA_FRAME_HEIGHT // COLUMNS)
 infoBtn.place(x=40, y=(modeMouse + 5) * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT - 80, height=DATA_FRAME_HEIGHT // COLUMNS)
 
