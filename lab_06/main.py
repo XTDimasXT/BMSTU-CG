@@ -1,3 +1,6 @@
+from algorithms import *
+from bresenham import bresenhem_int, bresenham_circle, bresenham_ellipse
+
 import tkinter as tk
 from tkinter import colorchooser, messagebox
 from constants import *
@@ -18,6 +21,192 @@ def clearScreen():
     canvasField.delete("all")
     canvasImg.put(CANVAS_COLOUR, to=(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT))
     canvasField.create_image(CANVAS_WIDTH // 2, CANVAS_HEIGHT // 2, image=canvasImg, state="normal")
+
+
+def fill_all_figures():
+    if not allFigures and not currentFigure:
+        messagebox.showwarning("Предупреждение!", "Фигура не введена для закраски!")
+    elif not allFigures and  currentFigure:
+        messagebox.showwarning("Предупреждение!", "Фигура не замкнута для закраски!")
+    else:
+
+        if not seed_pixels:
+            messagebox.showwarning("Предупреждение!", "Затравочный пиксел не установлен!")
+            return
+        if BORDER_COLOUR == FILL_COLOUR:
+            messagebox.showwarning("Предупреждение!", "Цвет границы и цвет закраски не должны совпадать!")
+            return
+        if BORDER_COLOUR == CANVAS_COLOUR:
+            messagebox.showwarning("Предупреждение!", "Цвет границы и цвет фона не должны совпадать!")
+            return
+        if CANVAS_COLOUR == FILL_COLOUR:
+            messagebox.showwarning("Предупреждение!", "Цвет фона и цвет закраски не должны совпадать!")
+            return
+
+        delay = False
+        if methodDraw.get() == 0:
+            delay = True
+        time_start = time.time()
+        line_by_line_filling_algorithm_with_seed(canvasField, canvasImg, BORDER_COLOUR,
+                                  FILL_COLOUR, seed_pixels[-1], delay=delay)
+        time_end = time.time() - time_start
+        if round(time_end * 1000, 2) < 1000:
+            timeLabel["text"] = "Время закраски: " + str(round(time_end * 1000, 2)) + " mc."
+        else:
+            timeLabel["text"] = "Время закраски: " + str(round(time_end, 2)) + " c."
+
+
+def get_point():
+    x = xEntry.get()
+    y = yEntry.get()
+    if not x or not y:
+        messagebox.showinfo("Предупреждение!", "Координаты точек не введены!")
+    else:
+        try:
+            x = int(x)
+            y = int(y)
+        except ValueError:
+            messagebox.showinfo("Предупреждение!", "Координаты точек должны быть только целые!")
+            return
+        add_point(x, y)
+
+
+def get_seed():
+    x = xEntry.get()
+    y = yEntry.get()
+    if not x or not y:
+        messagebox.showinfo("Предупреждение!", "Координаты точек не введены!")
+    else:
+        try:
+            x = int(x)
+            y = int(y)
+        except ValueError:
+            messagebox.showinfo("Предупреждение!", "Координаты точек должны быть только целые!")
+            return
+        add_seed(x, y)
+
+
+def close_figure():
+    global currentFigure
+    if len(currentFigure) > 2:
+        draw_line_on_img(canvasImg, currentFigure[-1], currentFigure[0], BORDER_COLOUR)
+
+        listPoint_scroll.insert(tk.END, "------------Closed------------")
+
+        allFigures.append(currentFigure)
+        currentFigure = []
+    elif len(currentFigure) == 0:
+        messagebox.showwarning("Предупреждение!", "Точки фигуры не введены!")
+    else:
+        messagebox.showwarning("Предупреждение!", "Такую фигуру нельзя замкнуть!\nНеобходимо как минимум, чтобы у фигуры было 3 точки!")
+
+
+def draw_line_on_img(img, ps, pe, colour="#000000"):
+    points = bresenhem_int(ps, pe)
+    for p in points:
+        draw_pixel(img, p.x, p.y, colour)
+
+
+def add_point(x, y, colour="#000000"):
+    if Point(x, y) not in currentFigure:
+        if currentFigure:
+            draw_line_on_img(canvasImg, currentFigure[-1], Point(x, y), colour)
+        index = len(currentFigure)
+        listPoint_scroll.insert(tk.END,  "{:3d}) X = {:4d}; Y = {:4d}".format(index + 1, x, y))
+        currentFigure.append(Point(x, y))
+    else:
+        messagebox.showwarning("Предупреждение!", "Точка с такими координатами фигуры уже введена!")
+
+
+def add_seed(x, y):
+    draw_pixel(canvasImg, x + 1, y + 1, "orange")
+    draw_pixel(canvasImg, x - 1, y + 1, "orange")
+    draw_pixel(canvasImg, x + 1, y, "orange")
+    draw_pixel(canvasImg, x, y + 1, "orange")
+    draw_pixel(canvasImg, x, y, "orange")
+    draw_pixel(canvasImg, x - 1, y, "orange")
+    draw_pixel(canvasImg, x, y - 1, "orange")
+    draw_pixel(canvasImg, x - 1, y - 1, "orange")
+    draw_pixel(canvasImg, x + 1, y - 1, "orange")
+
+    listPoint_scroll.insert(tk.END, "SEED PIXEL: ({:4d}; {:4d})".format(x, y))
+
+    seed_pixels.append(Point(x, y))
+
+
+def add_point_figure_onClick(event):
+    x, y = event.x,  event.y
+    add_point(x, y, BORDER_COLOUR)
+
+
+def add_circle():
+    xc = xcEntry.get()
+    yc = ycEntry.get()
+    r = rEntry.get()
+
+    if not xc or not yc:
+        messagebox.showwarning("Предупреждение!", "Точки центра окружности или эллипса не введены!")
+        return
+
+    if not r:
+        messagebox.showwarning("Предупреждение!", "Радиус окружности не введён!")
+        return
+
+    try:
+        xc = int(xc)
+        yc = int(yc)
+        r = int(r)
+    except ValueError:
+        messagebox.showwarning("Предупреждение!", "Данные для окружности или эллипса введены неверно!")
+        return
+
+    points = bresenham_circle(xc, yc, r)
+    allFigures.append(points)
+
+    for p in points:
+        draw_pixel(canvasImg, p.x, p.y, BORDER_COLOUR)
+
+    listPoint_scroll.insert(tk.END, "  CIRCLE")
+    listPoint_scroll.insert(tk.END, "  Xc = {:4d}; Yc = {:4d}".format(xc, yc))
+    listPoint_scroll.insert(tk.END, "  R = {:3d}".format(r))
+    listPoint_scroll.insert(tk.END, "  Количество точек: " + str(len(points)))
+    listPoint_scroll.insert(tk.END, "------------Closed------------")
+
+
+def add_ellipse():
+    xc = xcEntry.get()
+    yc = ycEntry.get()
+    rx = rxEntry.get()
+    ry = ryEntry.get()
+
+    if not xc or not yc:
+        messagebox.showwarning("Предупреждение!", "Точки центра окружности или эллипса не введены!")
+        return
+
+    if not rx or not ry:
+        messagebox.showwarning("Предупреждение!", "Радиусы эллипса не введёны!")
+        return
+
+    try:
+        xc = int(xc)
+        yc = int(yc)
+        rx = int(rx)
+        ry = int(ry)
+    except ValueError:
+        messagebox.showwarning("Предупреждение!", "Данные для окружности или эллипса введены неверно!")
+        return
+
+    points = bresenham_ellipse(xc, yc, rx, ry)
+    allFigures.append(points)
+
+    for p in points:
+        draw_pixel(canvasImg, p.x, p.y, BORDER_COLOUR)
+
+    listPoint_scroll.insert(tk.END, "  Ellipse")
+    listPoint_scroll.insert(tk.END, "  Xc = {:4d}; Yc = {:4d}".format(xc, yc))
+    listPoint_scroll.insert(tk.END, "  Rx = {:3d}; Ry = {:3d}".format(rx, ry))
+    listPoint_scroll.insert(tk.END, "  Количество точек: " + str(len(points)))
+    listPoint_scroll.insert(tk.END, "------------Closed------------")
 
 
 dataFrame = tk.Frame(root, width=DATA_FRAME_WIGHT, height=DATA_FRAME_HEIGHT)
@@ -104,6 +293,11 @@ msgAboutPoint = tk.Label(dataFrame, bg=MAIN_FRAME_COLOR, text="X       Y", font=
 xEntry = tk.Entry(dataFrame, bg=MAIN_COLOUR_LABEL_TEXT, font=("Consolas", 14), fg=MAIN_FRAME_COLOR, justify="center")
 yEntry = tk.Entry(dataFrame, bg=MAIN_COLOUR_LABEL_TEXT, font=("Consolas", 14), fg=MAIN_FRAME_COLOR, justify="center")
 
+drawPointBtn = tk.Button(dataFrame, bg=MAIN_COLOUR, fg=MAIN_COLOUR_LABEL_TEXT, text="Построить точку", font=("Consolas", 14), command=get_point)
+drawCloseBtn = tk.Button(dataFrame, bg=MAIN_COLOUR, fg=MAIN_COLOUR_LABEL_TEXT, text="Замкнуть фигуру", font=("Consolas", 14), command=close_figure)
+
+drawSeedBtn = tk.Button(dataFrame, bg=MAIN_COLOUR, fg=MAIN_COLOUR_LABEL_TEXT, text="Построить затравку", font=("Consolas", 14), command=get_seed)
+
 makePoint = modeDraw + 2.1
 pointMakeLabel.place(x=0, y=makePoint * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT, height=DATA_FRAME_HEIGHT // COLUMNS)
 msgAboutPoint.place(x=0, y=(makePoint + 1) * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT, height=DATA_FRAME_HEIGHT // COLUMNS)
@@ -112,6 +306,9 @@ xEntry.place(x=DATA_FRAME_WIGHT // 4, y=(makePoint + 2) * DATA_FRAME_HEIGHT // C
 yEntry.place(x=2 * DATA_FRAME_WIGHT // 4, y=(makePoint + 2) * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT // 4, height=DATA_FRAME_HEIGHT // COLUMNS)
 
 makePoint += 0.2
+drawPointBtn.place(x=10, y=(makePoint + 3) * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT // 2, height=DATA_FRAME_HEIGHT // COLUMNS)
+drawCloseBtn.place(x=DATA_FRAME_WIGHT // 2, y=(makePoint + 3) * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT // 2 - 10, height=DATA_FRAME_HEIGHT // COLUMNS)
+drawSeedBtn.place(x=DATA_FRAME_WIGHT // 3.5, y=(makePoint + 4) * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT // 2 - 10, height=DATA_FRAME_HEIGHT // COLUMNS)
 
 modeMouse = makePoint + 1
 
@@ -132,6 +329,8 @@ ycEntry = tk.Entry(dataFrame, bg=MAIN_COLOUR_LABEL_TEXT, font=("Consolas", 14), 
 rEntry = tk.Entry(dataFrame, bg=MAIN_COLOUR_LABEL_TEXT, font=("Consolas", 14), fg=MAIN_FRAME_COLOR, justify="center")
 rxEntry = tk.Entry(dataFrame, bg=MAIN_COLOUR_LABEL_TEXT, font=("Consolas", 14), fg=MAIN_FRAME_COLOR, justify="center")
 ryEntry = tk.Entry(dataFrame, bg=MAIN_COLOUR_LABEL_TEXT, font=("Consolas", 14), fg=MAIN_FRAME_COLOR, justify="center")
+drawCircleBtn = tk.Button(dataFrame, bg=MAIN_COLOUR, fg=MAIN_COLOUR_LABEL_TEXT, text="Построить окружность", font=("Consolas", 13), command=add_circle)
+drawEllipseBtn = tk.Button(dataFrame, bg=MAIN_COLOUR, fg=MAIN_COLOUR_LABEL_TEXT, text="Построить эллипс", font=("Consolas", 13), command=add_ellipse)
 
 makeCircleOREllipse = modeMouse + 5.2
 lineMakeLabel.place(x=0, y=makeCircleOREllipse * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT, height=DATA_FRAME_HEIGHT // COLUMNS)
@@ -144,11 +343,13 @@ lineMakeEllipse.place(x=DATA_FRAME_WIGHT // 2, y=(makeCircleOREllipse + 3) * DAT
 
 radiusCircleLabel.place(x=0, y=(makeCircleOREllipse + 4) * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT // 4, height=DATA_FRAME_HEIGHT // COLUMNS)
 rEntry.place(x=DATA_FRAME_WIGHT // 4, y=(makeCircleOREllipse + 4) * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT // 4 - 20, height=DATA_FRAME_HEIGHT // COLUMNS)
+drawCircleBtn.place(x=10, y=(makeCircleOREllipse + 6) * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT // 2 - 30, height=DATA_FRAME_HEIGHT // COLUMNS)
 
 heightEllipseLabel.place(x=10 + 2 * DATA_FRAME_WIGHT // 4, y=(makeCircleOREllipse + 4) * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT // 4 - 10, height=DATA_FRAME_HEIGHT // COLUMNS)
 widthEllipseLabel.place(x=10 + 2 * DATA_FRAME_WIGHT // 4, y=(makeCircleOREllipse + 5) * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT // 4 - 10, height=DATA_FRAME_HEIGHT // COLUMNS)
 rxEntry.place(x=10 + 3 * DATA_FRAME_WIGHT // 4, y=(makeCircleOREllipse + 4) * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT // 4 - 20, height=DATA_FRAME_HEIGHT // COLUMNS)
 ryEntry.place(x=10 + 3 * DATA_FRAME_WIGHT // 4, y=(makeCircleOREllipse + 5) * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT // 4 - 20, height=DATA_FRAME_HEIGHT // COLUMNS)
+drawEllipseBtn.place(x=10 + DATA_FRAME_WIGHT // 2, y=(makeCircleOREllipse + 6) * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT // 2 - 20, height=DATA_FRAME_HEIGHT // COLUMNS)
 
 
 def show_info():
@@ -168,12 +369,19 @@ canvasImg = tk.PhotoImage(width=CANVAS_WIDTH + 1, height=CANVAS_HEIGHT + 1)
 canvasField.create_image(CANVAS_WIDTH // 2, CANVAS_HEIGHT // 2, image=canvasImg, state="normal")
 canvasImg.put(CANVAS_COLOUR, to=(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT))
 
+canvasField.bind("<Button-1>", add_point_figure_onClick)
+canvasField.bind("<Button-2>", lambda event: add_seed(event.x, event.y))
+canvasField.bind("<Button-3>", lambda event: close_figure())
+canvasField.bind("<B1-Motion>", add_point_figure_onClick)
+
 
 timeLabel = tk.Label(root, bg="gray", text="Время закраски: ", font=("Consolas", 16), fg=MAIN_COLOUR_LABEL_TEXT)
+fillingBtn = tk.Button(dataFrame, bg=MAIN_COLOUR, fg=MAIN_COLOUR_LABEL_TEXT, text="Выполнить закраску", font=("Consolas", 14), command=fill_all_figures)
 clearCanvasBtn = tk.Button(dataFrame, bg=MAIN_COLOUR, fg=MAIN_COLOUR_LABEL_TEXT, text="Очистить экран", font=("Consolas", 14), command=clearScreen)
 infoBtn = tk.Button(dataFrame, bg=MAIN_COLOUR, fg=MAIN_COLOUR_LABEL_TEXT, text="Справка", font=("Consolas", 14), command=show_info)
 btninfo = makeCircleOREllipse + 7
 timeLabel.place(x=DATA_FRAME_WIGHT + 2 * BORDERS_SPACE, y=CANVAS_HEIGHT + BORDERS_SPACE - DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT - 60, height=DATA_FRAME_HEIGHT // COLUMNS)
+fillingBtn.place(x=40, y=(btninfo + 1) * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT - 80, height=DATA_FRAME_HEIGHT // COLUMNS)
 clearCanvasBtn.place(x=40, y=(btninfo + 2) * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT - 80, height=DATA_FRAME_HEIGHT // COLUMNS)
 infoBtn.place(x=40, y=(btninfo + 3) * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT - 80, height=DATA_FRAME_HEIGHT // COLUMNS)
 
