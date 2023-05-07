@@ -289,9 +289,7 @@ yrlEntry.place(x=3 * DATA_FRAME_WIGHT // 4, y=(makeClipper + 2) * DATA_FRAME_HEI
 makeClipper += 0.2
 drawClipperBtn.place(x=DATA_FRAME_WIGHT // 6, y=(makeClipper + 3) * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT // 1.5, height=DATA_FRAME_HEIGHT // COLUMNS)
 
-modeByMouse = tk.Label(dataFrame, bg=MAIN_COLOUR_LABEL_BG, text="ПОСТРОЕНИЕ С ПОМОЩЬЮ МЫШИ", font=("Consolas", 16), fg=MAIN_COLOUR_LABEL_TEXT, relief=tk.SOLID)
-modeMouse = makeClipper + 4 + 0.2
-modeByMouse.place(x=0, y=modeMouse * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT, height=DATA_FRAME_HEIGHT // COLUMNS)
+modeMouse = makeClipper + 4
 
 currentFigure = []
 allFigures = []
@@ -302,15 +300,11 @@ canvasField.pack(side=tk.RIGHT, padx=BORDERS_SPACE)
 canvasField.bind("<Button-3>", lambda event: click_right(event, lines, canvasField, LINE_COLOUR))
 canvasField.bind("<B1-Motion>", lambda event: click_left_motion(event))
 
-
-addLineBtn = tk.Button(dataFrame, bg=MAIN_COLOUR, fg=MAIN_COLOUR_LABEL_TEXT, text="Добавить горизонтальные и \nвертикальные отрезки", font=("Consolas", 14),
-                       command=lambda: add_vert_horiz_lines(rectangle, lines, canvasField, LINE_COLOUR))
 cutBtn = tk.Button(dataFrame, bg=MAIN_COLOUR, fg=MAIN_COLOUR_LABEL_TEXT, text="Отсечь", font=("Consolas", 14), command=cut_off_command)
 
 clearCanvasBtn = tk.Button(dataFrame, bg=MAIN_COLOUR, fg=MAIN_COLOUR_LABEL_TEXT, text="Очистить экран", font=("Consolas", 14), command=clear_canvas)
 infoBtn = tk.Button(dataFrame, bg=MAIN_COLOUR, fg=MAIN_COLOUR_LABEL_TEXT, text="Справка", font=("Consolas", 14), command=show_info)
 
-addLineBtn.place(x=40, y=(modeMouse + 1) * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT - 80, height=2 * DATA_FRAME_HEIGHT // COLUMNS)
 cutBtn.place(x=40, y=(modeMouse + 3) * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT - 80, height=DATA_FRAME_HEIGHT // COLUMNS)
 clearCanvasBtn.place(x=40, y=(modeMouse + 4) * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT - 80, height=DATA_FRAME_HEIGHT // COLUMNS)
 infoBtn.place(x=40, y=(modeMouse + 5) * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT - 80, height=DATA_FRAME_HEIGHT // COLUMNS)
