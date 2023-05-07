@@ -139,76 +139,6 @@ def add_point_figure_onClick(event):
     add_point(x, y, BORDER_COLOUR)
 
 
-def add_circle():
-    xc = xcEntry.get()
-    yc = ycEntry.get()
-    r = rEntry.get()
-
-    if not xc or not yc:
-        messagebox.showwarning("Предупреждение!", "Точки центра окружности или эллипса не введены!")
-        return
-
-    if not r:
-        messagebox.showwarning("Предупреждение!", "Радиус окружности не введён!")
-        return
-
-    try:
-        xc = int(xc)
-        yc = int(yc)
-        r = int(r)
-    except ValueError:
-        messagebox.showwarning("Предупреждение!", "Данные для окружности или эллипса введены неверно!")
-        return
-
-    points = bresenham_circle(xc, yc, r)
-    allFigures.append(points)
-
-    for p in points:
-        draw_pixel(canvasImg, p.x, p.y, BORDER_COLOUR)
-
-    listPoint_scroll.insert(tk.END, "  CIRCLE")
-    listPoint_scroll.insert(tk.END, "  Xc = {:4d}; Yc = {:4d}".format(xc, yc))
-    listPoint_scroll.insert(tk.END, "  R = {:3d}".format(r))
-    listPoint_scroll.insert(tk.END, "  Количество точек: " + str(len(points)))
-    listPoint_scroll.insert(tk.END, "------------Closed------------")
-
-
-def add_ellipse():
-    xc = xcEntry.get()
-    yc = ycEntry.get()
-    rx = rxEntry.get()
-    ry = ryEntry.get()
-
-    if not xc or not yc:
-        messagebox.showwarning("Предупреждение!", "Точки центра окружности или эллипса не введены!")
-        return
-
-    if not rx or not ry:
-        messagebox.showwarning("Предупреждение!", "Радиусы эллипса не введёны!")
-        return
-
-    try:
-        xc = int(xc)
-        yc = int(yc)
-        rx = int(rx)
-        ry = int(ry)
-    except ValueError:
-        messagebox.showwarning("Предупреждение!", "Данные для окружности или эллипса введены неверно!")
-        return
-
-    points = bresenham_ellipse(xc, yc, rx, ry)
-    allFigures.append(points)
-
-    for p in points:
-        draw_pixel(canvasImg, p.x, p.y, BORDER_COLOUR)
-
-    listPoint_scroll.insert(tk.END, "  Ellipse")
-    listPoint_scroll.insert(tk.END, "  Xc = {:4d}; Yc = {:4d}".format(xc, yc))
-    listPoint_scroll.insert(tk.END, "  Rx = {:3d}; Ry = {:3d}".format(rx, ry))
-    listPoint_scroll.insert(tk.END, "  Количество точек: " + str(len(points)))
-    listPoint_scroll.insert(tk.END, "------------Closed------------")
-
-
 dataFrame = tk.Frame(root, width=DATA_FRAME_WIGHT, height=DATA_FRAME_HEIGHT)
 dataFrame["bg"] = MAIN_FRAME_COLOR
 
@@ -252,8 +182,8 @@ def get_colour(mode):
         fillCurColourLabel.configure(bg=colour)
 
 
-borderColourBtn = tk.Button(dataFrame, bg=MAIN_COLOUR, fg=MAIN_COLOUR_LABEL_TEXT, text='Выбрать цвет гр-цы', font=("Consolas", 13), command=lambda: get_colour("border"))
-fillColourBtn = tk.Button(dataFrame, bg=MAIN_COLOUR, fg=MAIN_COLOUR_LABEL_TEXT, text='Выбрать цвет закр-ки', font=("Consolas", 13), command=lambda: get_colour("fill"))
+borderColourBtn = tk.Button(dataFrame, bg=MAIN_COLOUR, fg=MAIN_COLOUR_LABEL_TEXT, text='Выбрать цвет границы', font=("Consolas", 13), command=lambda: get_colour("border"))
+fillColourBtn = tk.Button(dataFrame, bg=MAIN_COLOUR, fg=MAIN_COLOUR_LABEL_TEXT, text='Выбрать цвет закраски', font=("Consolas", 13), command=lambda: get_colour("fill"))
 
 yColourLine = 1.2
 borderColourLabel.place(x=0, y=yColourLine * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT // 2.5, height=DATA_FRAME_HEIGHT // COLUMNS)
@@ -312,51 +242,15 @@ drawSeedBtn.place(x=DATA_FRAME_WIGHT // 3.5, y=(makePoint + 4) * DATA_FRAME_HEIG
 
 modeMouse = makePoint + 1
 
-lineMakeLabel = tk.Label(dataFrame, bg=MAIN_COLOUR_LABEL_BG, text="ПОСТРОЕНИЕ ОКРУЖНОСТИ ИЛИ ЭЛЛИПСА", font=("Consolas", 16), fg=MAIN_COLOUR_LABEL_TEXT, relief=tk.SOLID)
-lineMakeCircle = tk.Label(dataFrame, bg=MAIN_FRAME_COLOR, text="ОКРУЖНОСТЬ", font=("Consolas", 14), fg=MAIN_COLOUR_LABEL_TEXT)
-lineMakeEllipse = tk.Label(dataFrame, bg=MAIN_FRAME_COLOR, text="ЭЛЛИПС", font=("Consolas", 14), fg=MAIN_COLOUR_LABEL_TEXT)
-
-argumnetsCenterLabel = tk.Label(dataFrame, bg=MAIN_FRAME_COLOR, text="Коорд. центра:     Xс         Yс                  ",
-                     font=("Consolas", 13),  justify="right",
-                     fg=MAIN_COLOUR_LABEL_TEXT)
-
-radiusCircleLabel = tk.Label(dataFrame, bg=MAIN_FRAME_COLOR, text="Радиус (R):", font=("Consolas", 13),  justify="center", fg=MAIN_COLOUR_LABEL_TEXT)
-widthEllipseLabel = tk.Label(dataFrame, bg=MAIN_FRAME_COLOR, text="Высота (Ry):", font=("Consolas", 13),  justify="center", fg=MAIN_COLOUR_LABEL_TEXT)
-heightEllipseLabel = tk.Label(dataFrame, bg=MAIN_FRAME_COLOR, text="Ширина (Rx):", font=("Consolas", 13),  justify="center", fg=MAIN_COLOUR_LABEL_TEXT)
-
-xcEntry = tk.Entry(dataFrame, bg=MAIN_COLOUR_LABEL_TEXT, font=("Consolas", 14), fg=MAIN_FRAME_COLOR, justify="center")
-ycEntry = tk.Entry(dataFrame, bg=MAIN_COLOUR_LABEL_TEXT, font=("Consolas", 14), fg=MAIN_FRAME_COLOR, justify="center")
-rEntry = tk.Entry(dataFrame, bg=MAIN_COLOUR_LABEL_TEXT, font=("Consolas", 14), fg=MAIN_FRAME_COLOR, justify="center")
-rxEntry = tk.Entry(dataFrame, bg=MAIN_COLOUR_LABEL_TEXT, font=("Consolas", 14), fg=MAIN_FRAME_COLOR, justify="center")
-ryEntry = tk.Entry(dataFrame, bg=MAIN_COLOUR_LABEL_TEXT, font=("Consolas", 14), fg=MAIN_FRAME_COLOR, justify="center")
-drawCircleBtn = tk.Button(dataFrame, bg=MAIN_COLOUR, fg=MAIN_COLOUR_LABEL_TEXT, text="Построить окружность", font=("Consolas", 13), command=add_circle)
-drawEllipseBtn = tk.Button(dataFrame, bg=MAIN_COLOUR, fg=MAIN_COLOUR_LABEL_TEXT, text="Построить эллипс", font=("Consolas", 13), command=add_ellipse)
-
 makeCircleOREllipse = modeMouse + 5.2
-lineMakeLabel.place(x=0, y=makeCircleOREllipse * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT, height=DATA_FRAME_HEIGHT // COLUMNS)
-argumnetsCenterLabel.place(x=0, y=(makeCircleOREllipse + 1) * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT, height=DATA_FRAME_HEIGHT // COLUMNS)
-xcEntry.place(x=DATA_FRAME_WIGHT // 4, y=(makeCircleOREllipse + 2) * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT // 4, height=DATA_FRAME_HEIGHT // COLUMNS)
-ycEntry.place(x=2 * DATA_FRAME_WIGHT // 4, y=(makeCircleOREllipse + 2) * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT // 4, height=DATA_FRAME_HEIGHT // COLUMNS)
-
-lineMakeCircle.place(x=0, y=(makeCircleOREllipse + 3) * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT // 2, height=DATA_FRAME_HEIGHT // COLUMNS)
-lineMakeEllipse.place(x=DATA_FRAME_WIGHT // 2, y=(makeCircleOREllipse + 3) * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT // 2, height=DATA_FRAME_HEIGHT // COLUMNS)
-
-radiusCircleLabel.place(x=0, y=(makeCircleOREllipse + 4) * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT // 4, height=DATA_FRAME_HEIGHT // COLUMNS)
-rEntry.place(x=DATA_FRAME_WIGHT // 4, y=(makeCircleOREllipse + 4) * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT // 4 - 20, height=DATA_FRAME_HEIGHT // COLUMNS)
-drawCircleBtn.place(x=10, y=(makeCircleOREllipse + 6) * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT // 2 - 30, height=DATA_FRAME_HEIGHT // COLUMNS)
-
-heightEllipseLabel.place(x=10 + 2 * DATA_FRAME_WIGHT // 4, y=(makeCircleOREllipse + 4) * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT // 4 - 10, height=DATA_FRAME_HEIGHT // COLUMNS)
-widthEllipseLabel.place(x=10 + 2 * DATA_FRAME_WIGHT // 4, y=(makeCircleOREllipse + 5) * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT // 4 - 10, height=DATA_FRAME_HEIGHT // COLUMNS)
-rxEntry.place(x=10 + 3 * DATA_FRAME_WIGHT // 4, y=(makeCircleOREllipse + 4) * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT // 4 - 20, height=DATA_FRAME_HEIGHT // COLUMNS)
-ryEntry.place(x=10 + 3 * DATA_FRAME_WIGHT // 4, y=(makeCircleOREllipse + 5) * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT // 4 - 20, height=DATA_FRAME_HEIGHT // COLUMNS)
-drawEllipseBtn.place(x=10 + DATA_FRAME_WIGHT // 2, y=(makeCircleOREllipse + 6) * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT // 2 - 20, height=DATA_FRAME_HEIGHT // COLUMNS)
 
 
 def show_info():
     messagebox.showinfo('Информация',
-                        'С помощью данной программы можно построить фигуру и закрасить ее:\n'
-                        '\nДля построения закраски фигуры используется алгоритм с упорядоченным списоком ребер \n'
-                        'и его реализация САР(список активных ребер).\n')
+                        'Автор программы - Писаренко Дмитрий ИУ7-44Б\n'
+                        'С помощью данной программы можно осуществить затравочное заполнение сплошной области.\n'
+                        '=====ИНСТРУКЦИИ ПОЛЬЗОВАТЕЛЮ=====\n'
+                        'Левая кнопка мыши - добавить точку, колесико - добавить затравку, правая кнопка мыши - замкнуть фигуру.\n')
 
 currentFigure = []
 allFigures = []
@@ -384,13 +278,5 @@ timeLabel.place(x=DATA_FRAME_WIGHT + 2 * BORDERS_SPACE, y=CANVAS_HEIGHT + BORDER
 fillingBtn.place(x=40, y=(btninfo + 1) * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT - 80, height=DATA_FRAME_HEIGHT // COLUMNS)
 clearCanvasBtn.place(x=40, y=(btninfo + 2) * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT - 80, height=DATA_FRAME_HEIGHT // COLUMNS)
 infoBtn.place(x=40, y=(btninfo + 3) * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT - 80, height=DATA_FRAME_HEIGHT // COLUMNS)
-
-
-xcEntry.insert(0, "500")
-ycEntry.insert(0, "500")
-
-rEntry.insert(0, "100")
-rxEntry.insert(0, "200")
-ryEntry.insert(0, "100")
 
 root.mainloop()
