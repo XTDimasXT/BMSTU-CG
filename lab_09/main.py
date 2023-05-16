@@ -5,7 +5,7 @@ from constants import *
 from commands import clear_canvas, click_btn, close_figure, add_vertex, cut_off, show_info
 
 root = tk.Tk()
-root.title("КГ Лабораторная работа №9 \"Алгоритм \"")
+root.title("Лабораторная работа №9. Реализация алгоритма отсечения произвольного многоугольника выпуклым отсекателем")
 root["bg"] = MAIN_COLOUR
 
 root.geometry(str(WINDOW_WIDTH) + "x" + str(WINDOW_HEIGHT))
