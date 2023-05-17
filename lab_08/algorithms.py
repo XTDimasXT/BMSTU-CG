@@ -50,10 +50,10 @@ def cyrus_beck_alg(canvas, clipper_figure, line, res_color):
     t_beg = 0
     t_end = 1
 
-    dot1 = line[0]
+    dot1 = line[0]  
     dot2 = line[1]
 
-    d = [dot2[0] - dot1[0], dot2[1] - dot1[1]]  # директриса
+    d = [dot2[0] - dot1[0], dot2[1] - dot1[1]]
 
     for i in range(-2, len(clipper_figure) - 2):
         normal = get_normal(clipper_figure[i], clipper_figure[i + 1], clipper_figure[i + 2])
