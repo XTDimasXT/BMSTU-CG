@@ -25,7 +25,7 @@ chooseColourMainLabel = tk.Label(dataFrame, bg=MAIN_COLOUR_LABEL_BG, text="ВЫ�
 size = (DATA_FRAME_WIGHT // 1.7) // 8
 chooseColourMainLabel.place(x=0, y=0, width=DATA_FRAME_WIGHT, height=DATA_FRAME_HEIGHT // COLUMNS)
 
-lineColourLabel = tk.Label(dataFrame, bg=MAIN_FRAME_COLOR, text="Цвет фигуры:", font=("Consolas", 16), fg=MAIN_COLOUR_LABEL_TEXT)
+lineColourLabel = tk.Label(dataFrame, bg=MAIN_FRAME_COLOR, text="Цвет фигуры:", font=("Consolas", 13), fg=MAIN_COLOUR_LABEL_TEXT)
 
 
 def get_colour_line():
@@ -47,7 +47,7 @@ greenLine = tk.Button(dataFrame, bg="green", activebackground="green", command=l
 darkGreenLine = tk.Button(dataFrame, bg="darkgreen", activebackground="darkgreen", command=lambda: set_linecolour("darkgreen"))
 lightBlueLine = tk.Button(dataFrame, bg="lightblue", activebackground="lightblue", command=lambda: set_linecolour("lightblue"))
 
-lineColourBtn = tk.Button(dataFrame, bg=MAIN_COLOUR, fg=MAIN_COLOUR_LABEL_TEXT, text='Выбрать другой цвет фигуры', font=("Consolas", 14), command=get_colour_line)
+lineColourBtn = tk.Button(dataFrame, bg=MAIN_COLOUR, fg=MAIN_COLOUR_LABEL_TEXT, text='Выбрать другой цвет фигуры', font=("Consolas", 11), command=get_colour_line)
 
 yColourLine = 1.2
 lineColourLabel.place(x=5, y=yColourLine * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT // 2.5, height=DATA_FRAME_HEIGHT // COLUMNS)
@@ -63,7 +63,7 @@ lightBlueLine.place(x=DATA_FRAME_WIGHT // 2.5 + 7 * size, y=yColourLine * DATA_F
 
 lineColourBtn.place(x=DATA_FRAME_WIGHT // 3 - BORDERS_SPACE, y=(yColourLine + 1) * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT // 1.5, height=DATA_FRAME_HEIGHT // COLUMNS)
 
-clipperColourLabel = tk.Label(dataFrame, bg=MAIN_FRAME_COLOR, text="Цвет отсекателя:", font=("Consolas", 15), fg=MAIN_COLOUR_LABEL_TEXT)
+clipperColourLabel = tk.Label(dataFrame, bg=MAIN_FRAME_COLOR, text="Цвет отсекателя:", font=("Consolas", 13), fg=MAIN_COLOUR_LABEL_TEXT)
 
 
 def get_colour_clipper():
@@ -84,7 +84,7 @@ greenClipper = tk.Button(dataFrame, bg="green", activebackground="green", comman
 darkGreenClipper = tk.Button(dataFrame, bg="darkgreen", activebackground="darkgreen", command=lambda: set_clippercolour("darkgreen"))
 lightBlueClipper = tk.Button(dataFrame, bg="lightblue", activebackground="lightblue", command=lambda: set_clippercolour("lightblue"))
 
-clipperColourBtn = tk.Button(dataFrame, bg=MAIN_COLOUR, fg=MAIN_COLOUR_LABEL_TEXT, text='Выбрать другой цвет отсекателя', font=("Consolas", 14), command=get_colour_clipper)
+clipperColourBtn = tk.Button(dataFrame, bg=MAIN_COLOUR, fg=MAIN_COLOUR_LABEL_TEXT, text='Выбрать другой цвет отсекателя', font=("Consolas", 11), command=get_colour_clipper)
 
 yColourLine += 3
 clipperColourLabel.place(x=5, y=yColourLine * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT // 2.5, height=DATA_FRAME_HEIGHT // COLUMNS)
@@ -100,7 +100,7 @@ lightBlueClipper.place(x=DATA_FRAME_WIGHT // 2.5 + 7 * size, y=yColourLine * DAT
 
 clipperColourBtn.place(x=DATA_FRAME_WIGHT // 3 - BORDERS_SPACE, y=(yColourLine + 1) * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT // 1.5, height=DATA_FRAME_HEIGHT // COLUMNS)
 
-resultColourLabel = tk.Label(dataFrame, bg=MAIN_FRAME_COLOR, text="Цвет результата:", font=("Consolas", 15), fg=MAIN_COLOUR_LABEL_TEXT)
+resultColourLabel = tk.Label(dataFrame, bg=MAIN_FRAME_COLOR, text="Цвет результата:", font=("Consolas", 13), fg=MAIN_COLOUR_LABEL_TEXT)
 
 def get_colour_result():
     color_code = colorchooser.askcolor(title="Choose colour result")
@@ -120,7 +120,7 @@ greenResult = tk.Button(dataFrame, bg="green", activebackground="green", command
 darkGreenResult = tk.Button(dataFrame, bg="darkgreen", activebackground="darkgreen", command=lambda: set_resultcolour("darkgreen"))
 lightBlueResult = tk.Button(dataFrame, bg="lightblue", activebackground="lightblue", command=lambda: set_resultcolour("lightblue"))
 
-resultColourBtn = tk.Button(dataFrame, bg=MAIN_COLOUR, fg=MAIN_COLOUR_LABEL_TEXT, text='Выбрать другой цвет результата', font=("Consolas", 14), command=get_colour_result)
+resultColourBtn = tk.Button(dataFrame, bg=MAIN_COLOUR, fg=MAIN_COLOUR_LABEL_TEXT, text='Выбрать другой цвет результата', font=("Consolas", 11), command=get_colour_result)
 
 yColourLine += 3
 resultColourLabel.place(x=5, y=yColourLine * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT // 2.5, height=DATA_FRAME_HEIGHT // COLUMNS)
@@ -144,8 +144,8 @@ msgAboutPoint = tk.Label(dataFrame, bg=MAIN_FRAME_COLOR, text="X\t\t  Y", font=(
 xFigureEntry = tk.Entry(dataFrame, bg=MAIN_COLOUR_LABEL_TEXT, font=("Consolas", 14), fg=MAIN_FRAME_COLOR, justify="center")
 yFigureEntry = tk.Entry(dataFrame, bg=MAIN_COLOUR_LABEL_TEXT, font=("Consolas", 14), fg=MAIN_FRAME_COLOR, justify="center")
 
-drawFigureVertexBtn = tk.Button(dataFrame, bg=MAIN_COLOUR, fg=MAIN_COLOUR_LABEL_TEXT, text="Построить вершину", font=("Consolas", 14), command=lambda: add_vertex(canvasField, clipper, figure, CLIPPER_COLOUR, FIGURE_COLOUR, xFigureEntry, yFigureEntry))
-drawFigureCloseBtn = tk.Button(dataFrame, bg=MAIN_COLOUR, fg=MAIN_COLOUR_LABEL_TEXT, text="Замкнуть фигуру", font=("Consolas", 14), command=lambda: close_figure(canvasField, figure, FIGURE_COLOUR, "Фигура"))
+drawFigureVertexBtn = tk.Button(dataFrame, bg=MAIN_COLOUR, fg=MAIN_COLOUR_LABEL_TEXT, text="Построить вершину", font=("Consolas", 13), command=lambda: add_vertex(canvasField, clipper, figure, CLIPPER_COLOUR, FIGURE_COLOUR, xFigureEntry, yFigureEntry))
+drawFigureCloseBtn = tk.Button(dataFrame, bg=MAIN_COLOUR, fg=MAIN_COLOUR_LABEL_TEXT, text="Замкнуть фигуру", font=("Consolas", 13), command=lambda: close_figure(canvasField, figure, FIGURE_COLOUR, "Фигура"))
 
 makePoint = yColourLine + 3.1
 pointMakeLabel.place(x=0, y=makePoint * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT, height=DATA_FRAME_HEIGHT // COLUMNS)
@@ -166,8 +166,8 @@ msgAboutClipper = tk.Label(dataFrame, bg=MAIN_FRAME_COLOR, text="X\t\t  Y", font
 xclEntry = tk.Entry(dataFrame, bg=MAIN_COLOUR_LABEL_TEXT, font=("Consolas", 14), fg=MAIN_FRAME_COLOR, justify="center")
 yclEntry = tk.Entry(dataFrame, bg=MAIN_COLOUR_LABEL_TEXT, font=("Consolas", 14), fg=MAIN_FRAME_COLOR, justify="center")
 
-drawClipperVertexBtn = tk.Button(dataFrame, bg=MAIN_COLOUR, fg=MAIN_COLOUR_LABEL_TEXT, text="Построить вершину", font=("Consolas", 14), command=lambda: add_vertex(canvasField, figure, clipper, FIGURE_COLOUR, CLIPPER_COLOUR, xclEntry, yclEntry))
-drawClipperCloseBtn = tk.Button(dataFrame, bg=MAIN_COLOUR, fg=MAIN_COLOUR_LABEL_TEXT, text="Замкнуть отсекатель", font=("Consolas", 14), command=lambda: close_figure(canvasField, clipper, CLIPPER_COLOUR, "Отсекатель"))
+drawClipperVertexBtn = tk.Button(dataFrame, bg=MAIN_COLOUR, fg=MAIN_COLOUR_LABEL_TEXT, text="Построить вершину", font=("Consolas", 13), command=lambda: add_vertex(canvasField, figure, clipper, FIGURE_COLOUR, CLIPPER_COLOUR, xclEntry, yclEntry))
+drawClipperCloseBtn = tk.Button(dataFrame, bg=MAIN_COLOUR, fg=MAIN_COLOUR_LABEL_TEXT, text="Замкнуть отсекатель", font=("Consolas", 13), command=lambda: close_figure(canvasField, clipper, CLIPPER_COLOUR, "Отсекатель"))
 
 makeClipper = makePoint + 4.1
 clipperMakeLabel.place(x=0, y=makeClipper * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT, height=DATA_FRAME_HEIGHT // COLUMNS)
