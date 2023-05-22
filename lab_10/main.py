@@ -39,7 +39,7 @@ def main():
     colour_var = tk.IntVar()
     colour_var.set(2)
 
-    resColourLabel = tk.Label(dataFrame, bg=MAIN_FRAME_COLOR, text="Цвет функций:", font=("Consolas", 16), fg=MAIN_COLOUR_LABEL_TEXT)
+    resColourLabel = tk.Label(dataFrame, bg=MAIN_FRAME_COLOR, text="Цвет функций:", font=("Consolas", 14), fg=MAIN_COLOUR_LABEL_TEXT)
 
     whiteLine = tk.Button(dataFrame, bg="white", activebackground="white", command=lambda: set_res_colour("white"))
     yellowLine = tk.Button(dataFrame, bg="yellow", activebackground="yellow", command=lambda: set_res_colour("yellow"))
@@ -50,7 +50,7 @@ def main():
     darkGreenLine = tk.Button(dataFrame, bg="darkgreen", activebackground="darkgreen", command=lambda: set_res_colour("darkgreen"))
     lightBlueLine = tk.Button(dataFrame, bg="lightblue", activebackground="lightblue", command=lambda: set_res_colour("lightblue"))
 
-    resColourBtn = tk.Button(dataFrame, bg=MAIN_COLOUR, fg=MAIN_COLOUR_LABEL_TEXT, text='Выбрать другой цвет функций', font=("Consolas", 14), command=lambda: get_colour_res())
+    resColourBtn = tk.Button(dataFrame, bg=MAIN_COLOUR, fg=MAIN_COLOUR_LABEL_TEXT, text='Выбрать другой цвет функций', font=("Consolas", 12), command=lambda: get_colour_res())
 
     yColourLine = 1.2
     resColourLabel.place(x=5, y=yColourLine * DATA_FRAME_HEIGHT // COLUMNS, width=DATA_FRAME_WIGHT // 2.5, height=DATA_FRAME_HEIGHT // COLUMNS)
